@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夏の大還元祭 組合せシミュレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6F1; --card:#FFFFFF; --rose:#C98B8B; --rose-soft:#EBC9C6;
+  --rose-bg:#F7E7E4; --sage:#9DB29A; --sage-bg:#E8EEE6; --gold:#C7A063;
+  --ink:#5A4A45; --ink-soft:#8C7B74; --line:#EDE2DB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Zen Maru Gothic',sans-serif; color:var(--ink);
+  background:linear-gradient(180deg,#FBF6F1 0%,#F6ECE6 100%);
+  background-attachment:fixed; line-height:1.7; padding-bottom:160px;
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+header{text-align:center;padding:40px 16px 24px}
+.eyebrow{font-size:.8rem;letter-spacing:.25em;color:var(--gold);font-weight:700}
+h1{font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--rose);margin:6px 0 4px;letter-spacing:.04em}
+.subtitle{color:var(--ink-soft);font-size:.92rem}
+.rule-card{
+  background:var(--card);border-radius:22px;padding:20px 22px;margin:18px 0 8px;
+  box-shadow:0 8px 24px rgba(201,139,139,.10);border:1px solid var(--line);
+}
+.rule-card h2{font-family:'Shippori Mincho',serif;font-size:1.05rem;color:var(--rose);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.rule-pill{background:var(--rose-bg);border-radius:14px;padding:10px 14px;font-size:.86rem}
+.rule-pill b{color:var(--rose);font-size:1.15rem;font-family:'Shippori Mincho',serif}
+.note{font-size:.78rem;color:var(--ink-soft);margin-top:12px;background:var(--sage-bg);padding:10px 14px;border-radius:12px}
+.cat{font-family:'Shippori Mincho',serif;font-size:1.1rem;color:var(--sage);margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+.cat::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sage)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{
+  background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line);
+  box-shadow:0 4px 14px rgba(201,139,139,.07);display:flex;flex-direction:column;gap:10px;
+  transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;
+}
+.card.active{box-shadow:0 8px 22px rgba(201,139,139,.22);transform:translateY(-2px);border-color:var(--rose-soft)}
+.card .name{font-weight:700;font-size:.96rem;line-height:1.4}
+.card .price{font-family:'Shippori Mincho',serif;font-size:1.35rem;color:var(--rose)}
+.card .price small{font-size:.72rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:.68rem;padding:3px 9px;border-radius:20px;font-weight:500}
+.tag.main{background:var(--rose);color:#fff}
+.tag.sub{background:var(--sage-bg);color:var(--sage)}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.stepper .qty{font-family:'Shippori Mincho',serif;font-size:1.2rem;min-width:36px;text-align:center}
+.btn{
+  width:38px;height:38px;border:none;border-radius:50%;cursor:pointer;font-size:1.3rem;
+  background:var(--rose-bg);color:var(--rose);font-weight:700;transition:.12s;display:flex;align-items:center;justify-content:center;
+}
+.btn:hover{background:var(--rose);color:#fff}
+.btn:active{transform:scale(.9)}
+.btn.minus{background:#F1EAE6;color:var(--ink-soft)}
+.btn.minus:hover{background:var(--ink-soft);color:#fff}
+/* summary bar */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(201,139,139,.14);padding:14px 16px 18px;z-index:20;
+}
+.bar-in{max-width:880px;margin:0 auto}
+.bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:4px}
+.total{font-family:'Shippori Mincho',serif;font-size:1.6rem;color:var(--rose)}
+.total small{font-size:.8rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.count-chip{font-size:.82rem;color:var(--ink-soft)}
+.count-chip b{color:var(--sage)}
+.progress{height:14px;background:var(--rose-bg);border-radius:20px;overflow:hidden;position:relative}
+.progress .fill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--rose-soft),var(--rose),var(--gold));transition:width .4s ease}
+.status{margin-top:9px;font-size:.92rem;font-weight:500;text-align:center;min-height:1.5em}
+.status .hl{color:var(--rose);font-family:'Shippori Mincho',serif;font-size:1.1rem}
+.status.win{color:var(--sage)}
+.status.win .hl{color:var(--sage)}
+.cond{font-size:.74rem;color:var(--ink-soft);text-align:center;margin-top:4px}
+.cond .ng{color:#C9736B;font-weight:700}
+.cond .ok{color:var(--sage);font-weight:700}
+.add-card{margin-top:0}
+.add-lead{font-size:.84rem;color:var(--ink-soft);margin-bottom:12px}
+.add-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inp{font-family:'Zen Maru Gothic';font-size:.9rem;border:1.5px solid var(--line);border-radius:12px;
+  padding:10px 12px;background:#FCF8F5;color:var(--ink);outline:none}
+.inp:focus{border-color:var(--rose-soft)}
+.inp::placeholder{color:#C9B8B0}
+#cName{flex:1;min-width:140px}
+.price-inp{width:110px}.qty-inp{width:64px;text-align:center}
+.add-btn{border:none;background:var(--rose);color:#fff;font-family:'Zen Maru Gothic';font-weight:700;
+  border-radius:14px;padding:10px 18px;cursor:pointer;font-size:.9rem;transition:.12s}
+.add-btn:hover{background:#b87a7a}.add-btn:active{transform:scale(.96)}
+.custom-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.custom-item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--rose-bg);border-radius:12px;padding:9px 14px;font-size:.88rem}
+.custom-item .ci-name{flex:1}
+.custom-item .ci-sum{font-family:'Shippori Mincho',serif;color:var(--rose)}
+.ci-del{border:none;background:none;color:var(--ink-soft);font-size:1.1rem;cursor:pointer;padding:0 4px}
+.ci-del:hover{color:var(--rose)}
+.reset{display:block;margin:18px auto 0;background:none;border:1px solid var(--rose-soft);color:var(--rose);
+  border-radius:20px;padding:8px 22px;font-family:'Zen Maru Gothic';font-size:.85rem;cursor:pointer}
+.reset:hover{background:var(--rose-bg)}
+footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16px 0}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.rule-grid{grid-template-columns:1fr}h1{font-size:1.6rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">WELCIA ウエル活</div>
+    <h1>夏の大還元祭シミュレーター</h1>
+    <p class="subtitle">対象商品を組み合わせて、1,000円分キャッシュバックを狙おう♪</p>
+  </header>
+
+  <div class="rule-card">
+    <h2>🎀 キャンペーンのしくみ</h2>
+    <div class="rule-grid">
+      <div class="rule-pill">税込 <b>5,000円</b> 以上<br>→ <b>1,000pt</b> 還元</div>
+      <div class="rule-pill">税込 <b>2,500〜4,999円</b><br>→ <b>250pt</b> 還元</div>
+    </div>
+    <div class="note">
+      ※ 対象商品を<b>1会計で3点以上</b>購入が条件 ／ <b>エントリー必須</b> ／ 期間 6/1〜8/2 ／
+      還元は最大20回まで ／ 1pt＝1円相当のWAON POINT（9月上旬付与）。<br>
+      正確な対象商品・条件は店頭・公式キャンペーンページで必ずご確認ください。
+    </div>
+  </div>
+
+  <div id="catalog"></div>
+
+  <div class="cat">自分で追加</div>
+  <div class="rule-card add-card">
+    <p class="add-lead">リストにない対象商品を自由に追加できます♪（税込価格でどうぞ）</p>
+    <div class="add-form">
+      <input id="cName" class="inp" type="text" placeholder="商品名（任意）">
+      <input id="cPrice" class="inp price-inp" type="number" inputmode="numeric" placeholder="価格(税込)" min="0">
+      <input id="cQty" class="inp qty-inp" type="number" inputmode="numeric" value="1" min="1">
+      <button class="add-btn" onclick="addCustom()">＋ 追加</button>
+    </div>
+    <div id="customList" class="custom-list"></div>
+  </div>
+
+  <button class="reset" onclick="resetAll()">えらんだ商品をリセット</button>
+  <footer>価格は税込・SNS等の情報をもとにした参考値です。実際の価格は店舗により異なります。<br>うーまま 夏の大還元祭シミュレーター</footer>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="bar-top">
+      <div class="total"><span id="total">0</span><small> 円(税込)</small></div>
+      <div class="count-chip">えらんだ点数 <b id="count">0</b> 点</div>
+    </div>
+    <div class="progress"><div class="fill" id="fill"></div></div>
+    <div class="status" id="status">商品を選んでね♪</div>
+    <div class="cond" id="cond"></div>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [
+  // 食品（夏の大還元祭のみ）
+  {cat:"食品・オイル", name:"日清 こめ油 600g", price:537, camps:[]},
+  {cat:"食品・オイル", name:"日清 ヘルシーごま油 350g", price:494, camps:[]},
+  {cat:"食品・オイル", name:"日清 オリーブオイル 350g", price:624, camps:[]},
+  {cat:"食品・オイル", name:"日清 エキストラバージンオリーブオイル 350g", price:624, camps:[]},
+  {cat:"食品・オイル", name:"日清 MCTオイル", price:861, camps:[]},
+  {cat:"食品・オイル", name:"カントリーマアム チョコまみれ", price:213, camps:[]},
+  {cat:"食品・オイル", name:"カントリーマアム", price:289, camps:[]},
+  {cat:"食品・オイル", name:"アーモンド効果 砂糖不使用", price:116, camps:[]},
+  {cat:"食品・オイル", name:"アーモンド効果", price:429, camps:[]},
+  // オーラルケア
+  {cat:"オーラルケア", name:"モンダミン プレミアム本体", price:988, camps:["レシチャレ"]},
+  {cat:"オーラルケア", name:"NONIO マウスウォッシュ 600ml", price:547, camps:["レシチャレ"]},
+  {cat:"オーラルケア", name:"NONIO プラスホワイトニング デンタルリンス 600ml", price:657, camps:["レシチャレ"]},
+  // 美容（グレイスワン リンクルケア）
+  {cat:"美容（グレイスワン）", name:"グレイスワン リペアジェル", price:1870, camps:["レシチャレ"]},
+  {cat:"美容（グレイスワン）", name:"グレイスワン リフト液", price:1760, camps:["レシチャレ"]},
+  {cat:"美容（グレイスワン）", name:"グレイスワン エッセンス", price:3520, camps:["レシチャレ"]},
+  {cat:"美容（グレイスワン）", name:"グレイスワン ナイトリペアクリーム", price:3850, camps:["レシチャレ"]},
+  // おむつ（まとめ買いで単価が下がる・数量別価格表）
+  {cat:"おむつ", name:"グーン おむつ（まとめ買い）", tiered:true, packSize:56, camps:["20%還元"],
+   table:{1:1427,2:2750,3:3960,4:5335,5:6710,6:7920,7:9295,8:10670,9:11880,10:13255,
+          11:14630,12:15840,13:17215,14:18590,15:19800,16:21175,17:22550,18:23760,19:25135,20:26510,
+          21:27720,22:29095,23:30470,24:31680,25:33055,26:34430,27:35640,28:37015,29:38390,30:39600,31:40975,32:42350}},
+];
+
+const qty = PRODUCTS.map(()=>0);
+let customItems = [];
+
+function addCustom(){
+  const nameEl=document.getElementById('cName'), priceEl=document.getElementById('cPrice'), qtyEl=document.getElementById('cQty');
+  const price=parseInt(priceEl.value,10); let q=parseInt(qtyEl.value,10);
+  if(!price||price<=0){priceEl.focus();priceEl.style.borderColor='#C9736B';return;}
+  if(!q||q<1)q=1;
+  customItems.push({name:nameEl.value.trim()||'自分で追加した商品', price, qty:q});
+  nameEl.value='';priceEl.value='';qtyEl.value='1';priceEl.style.borderColor='';
+  renderCustom();recalc();
+}
+function removeCustom(i){customItems.splice(i,1);renderCustom();recalc();}
+function renderCustom(){
+  const el=document.getElementById('customList');
+  el.innerHTML=customItems.map((c,i)=>`
+    <div class="custom-item">
+      <span class="ci-name">${escapeHtml(c.name)} <small style="color:var(--ink-soft)">¥${c.price.toLocaleString()}×${c.qty}</small></span>
+      <span class="ci-sum">¥${(c.price*c.qty).toLocaleString()}</span>
+      <button class="ci-del" onclick="removeCustom(${i})">×</button>
+    </div>`).join('');
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+function render(){
+  const cats = [...new Set(PRODUCTS.map(p=>p.cat))];
+  const root = document.getElementById('catalog');
+  root.innerHTML = '';
+  cats.forEach(cat=>{
+    const h = document.createElement('div'); h.className='cat'; h.textContent=cat; root.appendChild(h);
+    const g = document.createElement('div'); g.className='grid';
+    PRODUCTS.forEach((p,i)=>{
+      if(p.cat!==cat) return;
+      const tags = `<span class="tag main">夏の大還元祭</span>` +
+        p.camps.map(c=>`<span class="tag sub">${c}</span>`).join('');
+      let priceHtml;
+      if(p.tiered){
+        if(qty[i]>0){
+          const n=Math.min(qty[i],32), pr=p.table[n], per=(pr/(p.packSize*n)).toFixed(1);
+          priceHtml=`${pr.toLocaleString()}<small> 円 (${per}円/枚)</small>`;
+        }else{
+          priceHtml=`${p.table[1].toLocaleString()}<small> 円〜 まとめ買いで単価DOWN</small>`;
+        }
+      }else{
+        priceHtml=`${p.price.toLocaleString()}<small> 円(税込)</small>`;
+      }
+      const card = document.createElement('div');
+      card.className='card'+(qty[i]>0?' active':'');
+      card.id='card'+i;
+      card.innerHTML = `
+        <div class="name">${p.name}</div>
+        <div class="price">${priceHtml}</div>
+        <div class="tags">${tags}</div>
+        <div class="stepper">
+          <button class="btn minus" onclick="dec(${i})">−</button>
+          <span class="qty" id="q${i}">${qty[i]}</span>
+          <button class="btn" onclick="inc(${i})">＋</button>
+        </div>`;
+      g.appendChild(card);
+    });
+    root.appendChild(g);
+  });
+}
+function inc(i){const p=PRODUCTS[i];if(p.tiered&&qty[i]>=32)return;qty[i]++;update(i)}
+function dec(i){if(qty[i]>0)qty[i]--;update(i)}
+function update(i){render();recalc()}
+function resetAll(){qty.fill(0);customItems=[];render();renderCustom();recalc()}
+
+function recalc(){
+  let total=0, count=0;
+  PRODUCTS.forEach((p,i)=>{
+    if(p.tiered){ if(qty[i]>0) total+=p.table[Math.min(qty[i],32)]; }
+    else total+=p.price*qty[i];
+    count+=qty[i];
+  });
+  customItems.forEach(c=>{ total+=c.price*c.qty; count+=c.qty; });
+  document.getElementById('total').textContent=total.toLocaleString();
+  document.getElementById('count').textContent=count;
+  const fill=document.getElementById('fill');
+  fill.style.width=Math.min(100,total/5000*100)+'%';
+
+  const st=document.getElementById('status'); st.className='status';
+  if(total>=5000){
+    st.className='status win';
+    st.innerHTML=`🎉 <span class="hl">1,000pt</span> 還元の対象です！実質 <span class="hl">${(total-1000).toLocaleString()}円</span>`;
+  }else if(total>=2500){
+    const toNext=5000-total;
+    st.innerHTML=`いま <span class="hl">250pt</span> 対象。あと <span class="hl">${toNext.toLocaleString()}円</span> で <span class="hl">1,000pt</span>！`;
+  }else if(total>0){
+    const toMin=2500-total;
+    st.innerHTML=`あと <span class="hl">${toMin.toLocaleString()}円</span> で 250pt 対象になります`;
+  }else{
+    st.textContent='商品を選んでね♪';
+  }
+
+  const cond=document.getElementById('cond');
+  if(count>0){
+    const cls = count>=3 ? 'ok':'ng';
+    const mark = count>=3 ? '✓ 3点以上クリア':'あと'+(3-count)+'点で条件達成';
+    cond.innerHTML = `購入点数の条件：<span class="${cls}">${mark}</span>（要エントリー）`;
+  }else{ cond.textContent=''; }
+}
+render(); recalc();
+</script>
+</body>
+</html>
