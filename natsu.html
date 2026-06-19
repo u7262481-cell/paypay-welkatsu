@@ -82,11 +82,11 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
   <div class="rule-card">
     <h2>🎀 キャンペーンのしくみ</h2>
     <ul>
-      <li>対象商品を<b>1会計で3点以上・税込5,000円以上</b>購入で<b>1,000pt</b>還元（2,500〜4,999円は250pt）</li>
-      <li><b>エントリー必須</b>／期間6/1〜8/2／最大20回</li>
-      <li>各商品は「夏のボーナス還元」＋一部「レシチャレ」併用で<b>実質額がさらにダウン（黒字も🔥）</b></li>
+      <li><b>夏ボ＝夏の大還元祭の還元</b>です。対象商品を<b>1会計3点以上・税込5,000円以上</b>購入で夏ボ還元が受けられます（<b>エントリー必須</b>／6/1〜8/2）</li>
+      <li>各商品の「夏ボ」＋一部「レシチャレ」併用で<b>実質額がさらにダウン（黒字も🔥）</b></li>
+      <li>条件（5,000円＆3点）未達のときは夏ボは未適用で計算します</li>
     </ul>
-    <div class="note">実質＝必要ポイント−夏ボーナス−レシチャレ−ボーナス（WAON POINTは1P=1円換算）。グーンは「まとめ買いで単価DOWN＋20%還元」。価格・還元は参考値で、店舗や時期で変わる場合があります。正確な条件は店頭・公式をご確認ください。</div>
+    <div class="note">実質＝必要ポイント−夏ボ(大還元祭)−レシチャレ−ボーナス（WAON POINTは1P=1円換算）。グーンは「まとめ買いで単価DOWN＋大還元祭20%還元」。価格・還元は参考値で、店舗や時期で変わる場合があります。正確な条件は店頭・公式をご確認ください。</div>
   </div>
   <div id="catalog"></div>
   <div class="cat">自分で追加</div>
@@ -219,17 +219,16 @@ function recalc(){
   document.getElementById('fill').style.width=Math.min(100,T/5000*100)+'%';
   const st=document.getElementById('status'),jb=document.getElementById('jisbox'),bd=document.getElementById('bd'),cd=document.getElementById('cond');
   if(T<=0){st.className='status';st.textContent='商品を選んでね♪';jb.textContent='';jb.className='jisbox';bd.textContent='';cd.textContent='';return;}
-  let cb=0;const enough=count>=3;
-  if(T>=5000&&enough)cb=1000;else if(T>=2500&&enough)cb=250;
-  st.className=(T>=5000&&enough)?'status win':'status';
-  if(T>=5000){st.innerHTML=enough?`🎉 <span class="hl">1,000pt</span> キャッシュバック対象！`:`5,000円達成！あと <span class="hl">${3-count}点</span> で対象（3点以上必要）`;}
-  else if(T>=2500){st.innerHTML=`いま250pt対象。あと <span class="hl">${(5000-T).toLocaleString()}円</span> で1,000pt！`;}
-  else{st.innerHTML=`あと <span class="hl">${(2500-T).toLocaleString()}円</span> で250pt対象`;}
-  const jisFinal=jisT-cb;
+  const enough=count>=3;const taisho=(T>=5000&&enough);
+  st.className=taisho?'status win':'status';
+  if(taisho){st.innerHTML=`🎉 大還元祭の対象！<span class="hl">夏ボ還元</span>が受けられます`;}
+  else if(T>=5000){st.innerHTML=`5,000円達成！あと <span class="hl">${3-count}点</span> で大還元祭の対象`;}
+  else{st.innerHTML=`あと <span class="hl">${(5000-T).toLocaleString()}円</span>${enough?'':'＆'+(3-count)+'点'} で大還元祭の対象`;}
+  const jisFinal=needT-reciT-(taisho?natsuT:0);
   jb.className=jisFinal<0?'jisbox kuroji':'jisbox';
-  jb.innerHTML=jisFinal<0?`⇒ 実質 ${Math.abs(jisFinal).toLocaleString()}円 黒字！🎉`:`⇒ 実質 ${jisFinal.toLocaleString()}円`;
-  bd.textContent=`必要ポイント ${needT.toLocaleString()}P ／ 夏ボ・還元 -${natsuT.toLocaleString()} ／ レシチャレ等 -${reciT.toLocaleString()}`+(cb?` ／ CB -${cb.toLocaleString()}`:'');
-  cd.innerHTML=`購入点数：<span class="${enough?'ok':'ng'}">${enough?'✓ 3点以上クリア':'あと'+(3-count)+'点で条件達成'}</span>（要エントリー）`;
+  jb.innerHTML=(jisFinal<0?`⇒ 実質 ${Math.abs(jisFinal).toLocaleString()}円 黒字！🎉`:`⇒ 実質 ${jisFinal.toLocaleString()}円`)+(taisho?'':' <small>(夏ボ未適用)</small>');
+  bd.textContent=`必要ポイント ${needT.toLocaleString()}P ／ 夏ボ(大還元祭) -${taisho?natsuT.toLocaleString():('0 対象で-'+natsuT.toLocaleString())} ／ レシチャレ等 -${reciT.toLocaleString()}`;
+  cd.innerHTML=`条件：<span class="${enough?'ok':'ng'}">${enough?'✓3点以上':'あと'+(3-count)+'点'}</span> ＋ <span class="${T>=5000?'ok':'ng'}">${T>=5000?'✓5,000円以上':'あと'+(5000-T).toLocaleString()+'円'}</span>（要エントリー）`;
 }
 render();renderCustom();recalc();
 </script>
