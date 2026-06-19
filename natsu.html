@@ -33,6 +33,8 @@ h1{font-family:'Shippori Mincho',serif;font-size:1.9rem;color:var(--rose);margin
 .card .price small{font-size:.68rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
 .card .jis{font-size:.74rem;border-radius:8px;padding:2px 8px;align-self:flex-start;background:var(--sage-bg);color:var(--sage)}
 .card .jis.kuroji{background:#FBE7E6;color:var(--rose);font-weight:700}
+.card .detail{font-size:.7rem;color:var(--ink-soft)}
+.card .detail .reci{color:var(--sage);font-weight:700}
 .stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
 .stepper .qty{font-family:'Shippori Mincho',serif;font-size:1.15rem;min-width:34px;text-align:center}
 .btn{width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;font-size:1.25rem;background:var(--rose-bg);color:var(--rose);font-weight:700;transition:.12s;display:flex;align-items:center;justify-content:center}
@@ -84,7 +86,7 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
       <li><b>エントリー必須</b>／期間6/1〜8/2／最大20回</li>
       <li>各商品は「夏のボーナス還元」＋一部「レシチャレ」併用で<b>実質額がさらにダウン（黒字も🔥）</b></li>
     </ul>
-    <div class="note">実質＝必要ポイント−夏ボーナス−レシチャレ−ボーナス（WAON POINTは1P=1円換算）。価格・還元は参考値で、店舗や時期で変わる場合があります。正確な条件は店頭・公式をご確認ください。</div>
+    <div class="note">実質＝必要ポイント−夏ボーナス−レシチャレ−ボーナス（WAON POINTは1P=1円換算）。グーンは「まとめ買いで単価DOWN＋20%還元」。価格・還元は参考値で、店舗や時期で変わる場合があります。正確な条件は店頭・公式をご確認ください。</div>
   </div>
   <div id="catalog"></div>
   <div class="cat">自分で追加</div>
@@ -117,8 +119,8 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
   </div>
 </div>
 <script>
+const GOON={1:1427,2:2750,3:3960,4:5335,5:6710,6:7920,7:9295,8:10670,9:11880,10:13255,11:14630,12:15840,13:17215,14:18590,15:19800,16:21175,17:22550,18:23760,19:25135,20:26510,21:27720,22:29095,23:30470,24:31680,25:33055,26:34430,27:35640,28:37015,29:38390,30:39600,31:40975,32:42350};
 const PRODUCTS=[
- // 食品・オイル（夏ボのみ）
  {cat:"食品・オイル",name:"日清 こめ油 600g",price:537,natsu:107,reci:0,bonus:0},
  {cat:"食品・オイル",name:"日清 ヘルシーごま油 350g",price:494,natsu:98,reci:0,bonus:0},
  {cat:"食品・オイル",name:"日清 オリーブオイル 350g",price:624,natsu:124,reci:0,bonus:0},
@@ -128,20 +130,16 @@ const PRODUCTS=[
  {cat:"食品・オイル",name:"カントリーマアム",price:289,natsu:57,reci:0,bonus:0},
  {cat:"食品・オイル",name:"アーモンド効果 砂糖不使用",price:116,natsu:23,reci:0,bonus:0},
  {cat:"食品・オイル",name:"アーモンド効果",price:429,natsu:85,reci:0,bonus:0},
- // オーラルケア（夏ボ＋レシチャレ）
  {cat:"オーラルケア",name:"モンダミン プレミアム本体",price:987,natsu:197,reci:400,bonus:150},
  {cat:"オーラルケア",name:"NONIO マウスウォッシュ 600ml",price:547,natsu:109,reci:150,bonus:0},
  {cat:"オーラルケア",name:"NONIO プラスホワイトニング デンタルリンス 600ml",price:657,natsu:131,reci:180,bonus:0},
- // 美容（グレイスワン リンクルケア・夏ボ＋レシチャレ）
  {cat:"美容（グレイスワン）",name:"グレイスワン リペアジェル",price:1870,natsu:374,reci:900,bonus:0},
  {cat:"美容（グレイスワン）",name:"グレイスワン リフト液",price:1760,natsu:352,reci:800,bonus:0},
  {cat:"美容（グレイスワン）",name:"グレイスワン エッセンス",price:3520,natsu:704,reci:1300,bonus:0},
  {cat:"美容（グレイスワン）",name:"グレイスワン ナイトリペアクリーム",price:3850,natsu:770,reci:1500,bonus:0},
- // ヘアケア（MEGAMIS・夏ボ＋レシチャレ）
  {cat:"ヘアケア（MEGAMIS）",name:"MEGAMIS シャンプー/ヘアセラム/トリートメント本体",price:1650,natsu:330,reci:350,bonus:0},
  {cat:"ヘアケア（MEGAMIS）",name:"MEGAMIS つめかえ用",price:1210,natsu:352,reci:200,bonus:0},
  {cat:"ヘアケア（MEGAMIS）",name:"MEGAMIS 本体トライアルセット",price:3080,natsu:616,reci:900,bonus:0},
- // スキンケア（メラノCC・夏ボのみ）
  {cat:"スキンケア（メラノCC）",name:"メラノCC ディープクリア酵素洗顔",price:786,natsu:157,reci:0,bonus:0},
  {cat:"スキンケア（メラノCC）",name:"メラノCC 朝用UV乳液",price:1210,natsu:242,reci:0,bonus:0},
  {cat:"スキンケア（メラノCC）",name:"メラノCC プレミアム濃密ビタミンC美容液",price:1628,natsu:325,reci:0,bonus:0},
@@ -149,11 +147,17 @@ const PRODUCTS=[
  {cat:"スキンケア（メラノCC）",name:"メラノCC 集中対策マスク 28枚",price:990,natsu:198,reci:0,bonus:0},
  {cat:"スキンケア（メラノCC）",name:"メラノCC 薬用しみ対策 美白化粧水",price:990,natsu:198,reci:0,bonus:0},
  {cat:"スキンケア（メラノCC）",name:"メラノCC 薬用しみ対策 美白乳液",price:767,natsu:153,reci:0,bonus:0},
+ {cat:"おむつ",name:"グーン おむつ（まとめ買い）",tiered:true,packSize:56},
 ];
 const qty=PRODUCTS.map(()=>0);
 let customItems=[];
 const needP=p=>Math.floor(p/1.5);
-const itemJis=p=>needP(p.price)-(p.natsu||0)-(p.reci||0)-(p.bonus||0);
+// per-line calculation (handles tiered グーン)
+function line(p,q){
+  if(q<=0)return {sub:0,needp:0,natsu:0,reci:0,jis:0};
+  if(p.tiered){const n=Math.min(q,32);const sub=GOON[n];const np=needP(sub);const na=Math.round(sub*0.2);return {sub,needp:np,natsu:na,reci:0,jis:np-na};}
+  const sub=p.price*q;const np=needP(p.price)*q;const na=(p.natsu||0)*q;const re=((p.reci||0)+(p.bonus||0))*q;return {sub,needp:np,natsu:na,reci:re,jis:np-na-re};
+}
 function render(){
   const cats=[...new Set(PRODUCTS.map(p=>p.cat))];
   const root=document.getElementById('catalog');root.innerHTML='';
@@ -162,13 +166,22 @@ function render(){
     const g=document.createElement('div');g.className='grid';
     PRODUCTS.forEach((p,i)=>{
       if(p.cat!==cat)return;
-      const j=itemJis(p);
+      let priceHtml,j;
+      if(p.tiered){
+        const n=Math.max(1,Math.min(qty[i],32));const sub=GOON[n];const l=line(p,qty[i]>0?qty[i]:1);
+        j=l.jis;
+        priceHtml=qty[i]>0?`${sub.toLocaleString()}<small> 円 (${(sub/(p.packSize*n)).toFixed(1)}円/枚)</small>`:`${GOON[1].toLocaleString()}<small> 円〜 まとめ買いで単価DOWN</small>`;
+      }else{priceHtml=`${p.price.toLocaleString()}<small> 円(税込)</small>`;j=line(p,1).jis;}
       const jcls=j<0?'jis kuroji':'jis';
-      const jtxt=j<0?('実質 '+Math.abs(j)+'円 黒字🔥'):('実質 '+j+'円');
+      const jtxt=j<0?('実質 '+Math.abs(j)+'円 黒字🔥'):('実質 '+j+'円'+(p.tiered?'〜':''));
+      let detail;
+      if(p.tiered){const nn=Math.max(1,Math.min(qty[i]||1,32));detail='20%還元 '+Math.round(GOON[nn]*0.2).toLocaleString()+'P';}
+      else{const parts=[];if(p.natsu)parts.push('夏ボ'+p.natsu+'P');if(p.reci)parts.push('<span class="reci">レシチャレ'+p.reci+'P</span>');if(p.bonus)parts.push('ボーナス'+p.bonus+'P');detail=parts.join('・');}
       const card=document.createElement('div');card.className='card'+(qty[i]>0?' active':'');card.id='card'+i;
       card.innerHTML=`<div class="name">${p.name}</div>
-        <div class="price">${p.price.toLocaleString()}<small> 円(税込)</small></div>
+        <div class="price">${priceHtml}</div>
         <div class="${jcls}">${jtxt}</div>
+        <div class="detail">${detail}</div>
         <div class="stepper"><button class="btn minus" onclick="dec(${i})">−</button>
         <span class="qty" id="q${i}">${qty[i]}</span>
         <button class="btn" onclick="inc(${i})">＋</button></div>`;
@@ -177,7 +190,7 @@ function render(){
     root.appendChild(g);
   });
 }
-function inc(i){qty[i]++;render();recalc()}
+function inc(i){const p=PRODUCTS[i];if(p.tiered&&qty[i]>=32)return;qty[i]++;render();recalc()}
 function dec(i){if(qty[i]>0)qty[i]--;render();recalc()}
 function resetAll(){qty.fill(0);customItems=[];render();renderCustom();recalc()}
 function addCustom(){
@@ -193,20 +206,19 @@ function removeCustom(i){customItems.splice(i,1);renderCustom();recalc()}
 function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function renderCustom(){
   document.getElementById('customList').innerHTML=customItems.map((c,i)=>{
-    const j=itemJis(c);
-    return `<div class="custom-item"><span>${esc(c.name)} <small style="color:var(--ink-soft)">¥${c.price.toLocaleString()}×${c.qty}・実質${j}円</small></span>
+    const j=line(c,c.qty).jis;
+    return `<div class="custom-item"><span>${esc(c.name)} <small style="color:var(--ink-soft)">¥${c.price.toLocaleString()}×${c.qty}・実質${Math.round(j/c.qty)}円</small></span>
     <button class="ci-del" onclick="removeCustom(${i})">×</button></div>`;}).join('');
 }
 function recalc(){
-  let T=0,count=0,natsuT=0,reciT=0,jisT=0;
-  PRODUCTS.forEach((p,i)=>{if(qty[i]>0){T+=p.price*qty[i];count+=qty[i];natsuT+=(p.natsu||0)*qty[i];reciT+=((p.reci||0)+(p.bonus||0))*qty[i];jisT+=itemJis(p)*qty[i];}});
-  customItems.forEach(c=>{T+=c.price*c.qty;count+=c.qty;natsuT+=(c.natsu||0)*c.qty;reciT+=((c.reci||0)+(c.bonus||0))*c.qty;jisT+=itemJis(c)*c.qty;});
+  let T=0,count=0,natsuT=0,reciT=0,jisT=0,needT=0;
+  PRODUCTS.forEach((p,i)=>{if(qty[i]>0){const l=line(p,qty[i]);T+=l.sub;count+=qty[i];natsuT+=l.natsu;reciT+=l.reci;jisT+=l.jis;needT+=l.needp;}});
+  customItems.forEach(c=>{const l=line(c,c.qty);T+=l.sub;count+=c.qty;natsuT+=l.natsu;reciT+=l.reci;jisT+=l.jis;needT+=l.needp;});
   document.getElementById('total').textContent=T.toLocaleString();
   document.getElementById('count').textContent=count;
   document.getElementById('fill').style.width=Math.min(100,T/5000*100)+'%';
   const st=document.getElementById('status'),jb=document.getElementById('jisbox'),bd=document.getElementById('bd'),cd=document.getElementById('cond');
   if(T<=0){st.className='status';st.textContent='商品を選んでね♪';jb.textContent='';jb.className='jisbox';bd.textContent='';cd.textContent='';return;}
-  // cashback
   let cb=0;const enough=count>=3;
   if(T>=5000&&enough)cb=1000;else if(T>=2500&&enough)cb=250;
   st.className=(T>=5000&&enough)?'status win':'status';
@@ -216,11 +228,8 @@ function recalc(){
   const jisFinal=jisT-cb;
   jb.className=jisFinal<0?'jisbox kuroji':'jisbox';
   jb.innerHTML=jisFinal<0?`⇒ 実質 ${Math.abs(jisFinal).toLocaleString()}円 黒字！🎉`:`⇒ 実質 ${jisFinal.toLocaleString()}円`;
-  bd.textContent=`必要ポイント ${needPtotal().toLocaleString()}P ／ 夏ボ -${natsuT.toLocaleString()} ／ レシチャレ等 -${reciT.toLocaleString()}`+(cb?` ／ CB -${cb.toLocaleString()}`:'');
+  bd.textContent=`必要ポイント ${needT.toLocaleString()}P ／ 夏ボ・還元 -${natsuT.toLocaleString()} ／ レシチャレ等 -${reciT.toLocaleString()}`+(cb?` ／ CB -${cb.toLocaleString()}`:'');
   cd.innerHTML=`購入点数：<span class="${enough?'ok':'ng'}">${enough?'✓ 3点以上クリア':'あと'+(3-count)+'点で条件達成'}</span>（要エントリー）`;
-}
-function needPtotal(){
-  let s=0;PRODUCTS.forEach((p,i)=>{if(qty[i]>0)s+=needP(p.price)*qty[i];});customItems.forEach(c=>s+=needP(c.price)*c.qty);return s;
 }
 render();renderCustom();recalc();
 </script>
