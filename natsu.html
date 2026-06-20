@@ -175,8 +175,8 @@ function render(){
       const jcls=j<0?'jis kuroji':'jis';
       const jtxt=j<0?('実質 '+Math.abs(j)+'円 黒字🔥'):('実質 '+j+'円'+(p.tiered?'〜':''));
       let detail;
-      if(p.tiered){const nn=Math.max(1,Math.min(qty[i]||1,32));detail='20%還元 '+Math.round(GOON[nn]*0.2).toLocaleString()+'P';}
-      else{const parts=[];if(p.natsu)parts.push('夏ボ'+p.natsu+'P');if(p.reci)parts.push('<span class="reci">レシチャレ'+p.reci+'P</span>');if(p.bonus)parts.push('ボーナス'+p.bonus+'P');detail=parts.join('・');}
+      if(p.tiered){detail='';}
+      else{const parts=[];if(p.reci)parts.push('<span class="reci">レシチャレ'+p.reci+'P</span>');if(p.bonus)parts.push('ボーナス'+p.bonus+'P');detail=parts.join('・');}
       const card=document.createElement('div');card.className='card'+(qty[i]>0?' active':'');card.id='card'+i;
       card.innerHTML=`<div class="name">${p.name}</div>
         <div class="price">${priceHtml}</div>
