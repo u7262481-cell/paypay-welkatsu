@@ -70,6 +70,15 @@ h1{font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--rose);margin:6
 .total small{font-size:.8rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
 .count-chip{font-size:.82rem;color:var(--ink-soft)}
 .count-chip b{color:var(--sage)}
+.split{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
+.split .box{border-radius:14px;padding:9px 8px;text-align:center}
+.split .b1{background:var(--rose-bg)}.split .b2{background:var(--sage-bg)}.split .b3{background:#F7EEDF}
+.split .lbl{font-size:.68rem;font-weight:700;line-height:1.3}
+.split .b1 .lbl{color:var(--rose)}.split .b2 .lbl{color:var(--sage)}.split .b3 .lbl{color:var(--gold)}
+.split .val{font-family:'Shippori Mincho',serif;font-size:1.2rem;margin-top:2px}
+.split .b1 .val{color:var(--rose)}.split .b2 .val{color:var(--sage)}.split .b3 .val{color:var(--gold)}
+.split .val small{font-size:.66rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+@media(max-width:560px){.split .val{font-size:1rem}.split .lbl{font-size:.62rem}}
 .progress{height:14px;background:var(--rose-bg);border-radius:20px;overflow:hidden;position:relative}
 .progress .fill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--rose-soft),var(--rose),var(--gold));transition:width .4s ease}
 .status{margin-top:9px;font-size:.92rem;font-weight:500;text-align:center;min-height:1.5em}
@@ -151,6 +160,11 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
       <div class="total"><span id="total">0</span><small> 円(税込)</small></div>
       <div class="count-chip">えらんだ点数 <b id="count">0</b> 点</div>
     </div>
+    <div class="split">
+      <div class="box b1"><div class="lbl">必要WAON POINT</div><div class="val"><span id="needP">0</span><small> P</small></div></div>
+      <div class="box b2"><div class="lbl">付与ポイント</div><div class="val"><span id="getP">0</span><small> pt</small></div></div>
+      <div class="box b3"><div class="lbl">還元率</div><div class="val"><span id="rate">0</span><small> %</small></div></div>
+    </div>
     <div class="progress"><div class="fill" id="fill"></div></div>
     <div class="status" id="status">商品を選んでね♪</div>
     <div class="cond" id="cond"></div>
@@ -181,11 +195,8 @@ const PRODUCTS = [
   // 虫よけ・殺虫（7月の夏の対象）
   {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 玄関用", price:932, camps:["レシチャレ"]},
   {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 複数パック", price:1848, camps:["レシチャレ"]},
-  // おむつ（まとめ買いで単価が下がる・数量別価格表）
-  {cat:"おむつ", name:"グーン おむつ（まとめ買い）", tiered:true, packSize:56, camps:["20%還元"],
-   table:{1:1427,2:2750,3:3960,4:5335,5:6710,6:7920,7:9295,8:10670,9:11880,10:13255,
-          11:14630,12:15840,13:17215,14:18590,15:19800,16:21175,17:22550,18:23760,19:25135,20:26510,
-          21:27720,22:29095,23:30470,24:31680,25:33055,26:34430,27:35640,28:37015,29:38390,30:39600,31:40975,32:42350}},
+  // おむつ（7月はまとめ買い割引なし・1個あたり定価）
+  {cat:"おむつ", name:"グーン おむつ", price:1427.8, camps:["20%還元"]},
 ];
 
 const qty = PRODUCTS.map(()=>0);
@@ -268,6 +279,12 @@ function recalc(){
   document.getElementById('count').textContent=count;
   const fill=document.getElementById('fill');
   fill.style.width=Math.min(100,total/5000*100)+'%';
+
+  // 必要WAON POINT（ウエル活は1.5倍）／付与ポイント／還元率
+  const getPt = total>=5000?1000: total>=2500?250:0;
+  document.getElementById('needP').textContent = Math.floor(total/1.5).toLocaleString();
+  document.getElementById('getP').textContent = getPt.toLocaleString();
+  document.getElementById('rate').textContent = total>0 ? (getPt/total*100).toFixed(1) : '0';
 
   const st=document.getElementById('status'); st.className='status';
   if(total>=5000){
