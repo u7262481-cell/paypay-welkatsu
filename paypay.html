@@ -45,6 +45,7 @@ h1{font-family:'Shippori Mincho',serif;font-size:1.55rem;color:var(--rose);margi
 .price-in:focus{border-bottom-color:var(--rose)}
 .card .reci{font-size:.7rem;color:var(--sage);background:var(--sage-bg);border-radius:8px;padding:2px 8px;align-self:flex-start}
 .card .reci.bns{color:#B08A3E;background:#FBF2DF}
+.card .reci.ntu{color:#3E86B0;background:#E6F3FB}
 .card .pbadge{font-size:.7rem;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:2px 8px;align-self:flex-start}
 .card .note{font-size:.68rem;color:#B5726F;background:#FBEFEC;border-radius:8px;padding:3px 8px;line-height:1.5}
 .stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
@@ -140,7 +141,7 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
   </div>
 
   <button class="reset" onclick="resetAll()">えらんだ商品をリセット</button>
-  <footer>レシチャレ・WAONボーナスPは<b>確認できた商品のみ</b>表示・計算しています（未表示＝未確認）。<br>「夏のボーナス大還元祭20%」は条件付きのため実質計算に含めていません。<br>クーポン一覧は7月時点のもので、配信状況・対象商品・期間は変わることがあります。<br>スクラビングバブル（ジョンソン）は対象クーポンが2種類配信されています。<br>PayPay／WAON POINTの内訳は目安で、端数や店舗により実際と異なる場合があります。<br>最新の条件はPayPayアプリのクーポン画面をご確認ください。<br>うーまま ウエル活×PayPayクーポン シミュレーター</footer>
+  <footer>レシチャレ・WAONボーナスP・夏ボ対象は<b>確認できた商品のみ</b>表示・計算しています（未表示＝未確認）。<br>「夏のボーナス大還元祭20%」は夏ボ対象商品を<b>3点以上かつ税込5,000円以上</b>買ったときだけ加算されます。<br>クーポン一覧は7月時点のもので、配信状況・対象商品・期間は変わることがあります。<br>スクラビングバブル（ジョンソン）は対象クーポンが2種類配信されています。<br>PayPay／WAON POINTの内訳は目安で、端数や店舗により実際と異なる場合があります。<br>最新の条件はPayPayアプリのクーポン画面をご確認ください。<br>うーまま ウエル活×PayPayクーポン シミュレーター</footer>
 </div>
 
 <div class="bar">
@@ -163,9 +164,9 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
 const PRODUCTS = [
   // 30%
   {cat:"30%還元", name:"ザバス BIOPRO ホエイプロテイン100", maker:"明治", rate:0.30},
-  {cat:"30%還元", name:"ナチュラ さら肌さらり 大容量72枚", maker:"エリエール（大王製紙）", rate:0.30, price:580, bonus:100},
-  {cat:"30%還元", name:"ナチュラ さら肌さらり 通常パック", maker:"エリエール（大王製紙）", rate:0.30, price:327.8, bonus:50},
-  {cat:"30%還元", name:"ナチュラ さら肌さらり 吸水ケアナプキン 50cc", maker:"エリエール（大王製紙）", rate:0.30, price:547.8, bonus:50},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 大容量72枚", maker:"エリエール（大王製紙）", rate:0.30, price:580, bonus:100, natsu:true},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 通常パック", maker:"エリエール（大王製紙）", rate:0.30, price:327.8, bonus:50, natsu:true},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 吸水ケアナプキン 50cc", maker:"エリエール（大王製紙）", rate:0.30, price:547.8, bonus:50, natsu:true},
   // 20%
   {cat:"20%還元", name:"完全メシ 各種", maker:"日清食品", rate:0.20},
   {cat:"20%還元", name:"フィニッシュ タブレット", maker:"レキットベンキーザー", rate:0.20},
@@ -192,8 +193,9 @@ const PRODUCTS = [
   {cat:"10%還元", name:"い・ろ・は・す 540ml 1本", maker:"コカ・コーラ ボトラーズ", rate:0.10, price:84.24, note:"クーポン対象は540mlのみ"},
   {cat:"10%還元", name:"い・ろ・は・す 540ml ケース24本", maker:"コカ・コーラ ボトラーズ", rate:0.10, price:1941.84},
   {cat:"10%還元", name:"カゴメ トマトジュース 各種", maker:"カゴメ", rate:0.10},
-  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用", maker:"アース製薬", rate:0.10, price:932.8, note:"あみ戸用プレートはPayPay対象外", reci:340, bonus:80},
-  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用 2個入", maker:"アース製薬", rate:0.10, price:1848, reci:680, bonus:160},
+  {cat:"10%還元", name:"マモルーム 貼るだけプレート あみ戸用 9ヵ月用", maker:"アース製薬", rate:0.10, price:968, reci:340, bonus:100, note:"JAN 4901080324313", natsu:true},
+  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用", maker:"アース製薬", rate:0.10, price:932.8, reci:340, bonus:80, note:"JAN 4901080324412（玄関用）／4901080324511", natsu:true},
+  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用 2個入", maker:"アース製薬", rate:0.10, price:1848, reci:680, bonus:160, note:"JAN 4901080327512", natsu:true},
   {cat:"10%還元", name:"ジュレリッチ リュール 各種", maker:"全薬販売", rate:0.10},
   {cat:"10%還元", name:"RESTA 洗顔・クレンジング 各種", maker:"ロート製薬", rate:0.10},
   {cat:"10%還元", name:"食品にも使えるアルコール 各種", maker:"フマキラー", rate:0.10},
@@ -226,6 +228,7 @@ function render(){
         <div class="pbadge" id="badge${i}">${badge}</div>
         ${p.reci?`<div class="reci">レシチャレ併用で+${p.reci.toLocaleString()}P還元</div>`:''}
         ${p.bonus?`<div class="reci bns">WAONボーナス +${p.bonus.toLocaleString()}P</div>`:''}
+        ${p.natsu?`<div class="reci ntu">夏のボーナス大還元祭 20%対象</div>`:''}
         ${p.note?`<div class="note">⚠ ${p.note}</div>`:''}
         <div class="stepper">
           <button class="btn minus" onclick="dec(${i})">−</button>
@@ -271,7 +274,7 @@ function renderCustom(){
 }
 
 function recalc(){
-  let T=0,count=0,rawReward=0,reciTotal=0,bonusTotal=0;
+  let T=0,count=0,rawReward=0,reciTotal=0,bonusTotal=0,natsuSub=0,natsuCount=0;
   PRODUCTS.forEach((p,i)=>{
     if(qty[i]<=0)return;
     const sub=(price[i]||0)*qty[i];
@@ -279,9 +282,12 @@ function recalc(){
     rawReward += p.fixedPt ? p.fixedPt*qty[i] : Math.floor(sub*p.rate);
     reciTotal += (p.reci||0)*qty[i];
     bonusTotal += (p.bonus||0)*qty[i];
+    if(p.natsu){natsuSub+=sub;natsuCount+=qty[i];}
   });
   customItems.forEach(c=>{const sub=c.price*c.qty;T+=sub;count+=c.qty;rawReward+=Math.floor(sub*c.rate);reciTotal+=(c.reci||0)*c.qty;});
   T=Math.round(T);
+  const natsuOK = natsuCount>=3 && natsuSub>=5000;
+  const natsuP = natsuOK ? Math.floor(natsuSub*0.2) : 0;
   const waonMult=document.getElementById('welka').checked?1.5:1;
   document.getElementById('total').textContent=T.toLocaleString();
   document.getElementById('count').textContent=count;
@@ -302,8 +308,13 @@ function recalc(){
   st.innerHTML=`✓ PayPay <span class="hl">${payPay.toLocaleString()}円</span> ＋ WAON POINT <span class="hl">${waonP.toLocaleString()}P</span>`;
   rw.innerHTML=`PayPayクーポン還元 約${reward.toLocaleString()}pt`+(rawReward>PCAP?'（上限10,000P到達）':'')
     +(reciTotal>0?` ＋ レシチャレ ${reciTotal.toLocaleString()}P`:'')
-    +(bonusTotal>0?` ＋ WAONボーナス ${bonusTotal.toLocaleString()}P`:'');
-  const jisshitsu = payPay + waonP - reward - reciTotal - bonusTotal;
+    +(bonusTotal>0?` ＋ WAONボーナス ${bonusTotal.toLocaleString()}P`:'')
+    +(natsuP>0?` ＋ 夏ボ20% ${natsuP.toLocaleString()}P`:'');
+  if(natsuCount>0&&!natsuOK){
+    const needN=Math.max(0,3-natsuCount), needY=Math.max(0,5000-Math.round(natsuSub));
+    rw.innerHTML+=`<br><span style="color:#3E86B0">夏ボ20%まで あと${needN>0?`${needN}点`:''}${needN>0&&needY>0?'・':''}${needY>0?`${needY.toLocaleString()}円`:''}</span>`;
+  }
+  const jisshitsu = payPay + waonP - reward - reciTotal - bonusTotal - natsuP;
   if(jisshitsu<0){
     ji.className='jisshitsu kuroji';
     ji.innerHTML=`⇒ 実質 ${Math.abs(jisshitsu).toLocaleString()}円 黒字！🎉`;
