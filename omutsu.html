@@ -127,7 +127,8 @@
   <div id="comboView" class="hide">
     <div class="muted" style="margin:2px 2px 10px">
       買う商品の個数を＋−で選ぶと、下に合計・ポイント払い・還元・実質が出ます。<br>
-      40%(上限1000pt)・+10%(上限400pt)は通算枠で共有。P&amp;G対象2,500円以上で+500pt併用込み。
+      40%(上限1000pt)・+10%(上限400pt)は通算枠で共有。P&amp;G対象2,500円以上で+500pt併用込み。<br>
+      グーンのウエルシア20%は「3点以上かつ2,500円以上」が条件。足りない分は<b>他のキャンペーン対象商品と合算</b>してください。
     </div>
     <div id="comboList"></div>
   </div>
@@ -170,7 +171,7 @@ const DEFAULT_PRODUCTS = [
     p1:1628,p2:1540,p3:1485, c:{big:22}},
   {name:"メリーズファーストプレミアム", brand:"花王", campaign:false, available:true,
     p1:1482.8,p2:null,p3:null, c:{newborn:66,sTape:54,mTape:48,mPants:46,L:36,big:32}},
-  {name:"グーン", brand:"エリエール", campaign:false, available:true,
+  {name:"グーン", brand:"エリエール", campaign:false, welcia20:true, available:true,
     p1:1427.8,p2:1427.8,p3:1427.8, c:{newborn:68,sTape:62,mTape:52,mPants:66,L:56,big:50,bigPlus:34}},
   {name:"ムーニー", brand:"ユニ・チャーム", campaign:false, available:true,
     p1:1526.8,p2:null,p3:null, c:{newborn:76,sTape:70,mTape:56,mPants:48,L:40,big:36}},
@@ -190,6 +191,8 @@ const BONUS_RATE = 0.10;   // +10%還元（おやすみパンツ/超吸収エア
 const BONUS_CAP  = 400;    // +10%還元 上限pt
 const PG_MIN  = 2500;      // P&G夏のヒーロー大集合：対象2,500円以上で
 const PG_BACK = 500;       // 500pt還元（お一人1回）
+const WEL_RATE = 0.20;     // ウエルシア夏のボーナス大還元祭：対象商品20%還元
+const WEL_CAP  = 1000;     // 上限1,000pt（1会計）※3点以上かつ2,500円以上が条件
 const PERIOD = "2026/7/16(木)〜8/31(月)　※ウエル活は毎月20日";
 
 /* ================= 状態 ================= */
@@ -246,11 +249,12 @@ function bestForSize(p, sizeKey){
     const r40 = Math.min(Math.floor(pamp*CAMP_RATE), CAMP_CAP);
     const r10 = Math.min(Math.floor(bonus*BONUS_RATE), BONUS_CAP);
     const r500 = pg>=PG_MIN ? PG_BACK : 0;
-    const real = Math.round(pt + pay - (r40+r10+r500));
+    const rWel = p.welcia20 ? Math.min(Math.floor(total*WEL_RATE), WEL_CAP) : 0;
+    const real = Math.round(pt + pay - (r40+r10+r500+rWel));
     const per = real / sheets;
     // まとめ買いは1枚あたり0.1円以上安くなる時だけ採用（無駄な多買いを防ぐ）
     if(!best || per < best.per - 0.1){
-      best = {n, total, sheets, per, pt, pay, r40, r10, r500, reward:r40+r10+r500, real};
+      best = {n, total, sheets, per, pt, pay, r40, r10, r500, rWel, reward:r40+r10+r500+rWel, real};
     }
   }
   return best;
@@ -298,7 +302,7 @@ function render(){
     html += `<div class="row${i===0?' top':''}">
       <div class="rank">${i+1}</div>
       <div class="info">
-        <div class="pname">${p.name}${p.campaign?('<span class="badge">'+(p.bonus10?'50%対象':'40%対象')+'</span>'):''}</div>
+        <div class="pname">${p.name}${p.campaign?('<span class="badge">'+(p.bonus10?'50%対象':'40%対象')+'</span>'):''}${p.welcia20?'<span class="badge">ウエルシア20%</span>':''}</div>
         <div class="psub">${p.brand}・${b.sheets}枚（${b.n}個×${b.sheets/b.n}枚）</div>
         <details class="bd">
           <summary>内訳を見る ▾</summary>
@@ -310,6 +314,7 @@ function render(){
             <span>40%還元</span><b>${p.campaign?('−'+yen(b.r40)+'pt'):'−'}</b>
             ${p.bonus10?`<span>+10%還元</span><b>−${yen(b.r10)}pt</b>`:''}
             ${b.r500?`<span>P&G500pt</span><b>−500pt</b>`:''}
+            ${b.rWel?`<span>ウエルシア20%</span><b>−${yen(b.rWel)}pt</b>`:''}
             <span>実質コスト</span><b>${yen(b.real)}円</b>
           </div>
         </details>
@@ -326,14 +331,15 @@ function render(){
     `対象期間：${PERIOD}<br>`+
     `組み合わせ込み最適化：各商品を主役に、複数個買い・40%(上限1000pt)・+10%(上限400pt)・P&G対象2,500円以上で+500ptを自動で一番安くなる買い方で計算<br>`+
     `計算式：ウエル活pt=四捨五入((総額−1)÷1.5)、楽天ペイ=総額−pt×1.5、実質＝pt＋楽天ペイ−還元（1pt=1円）<br>`+
-    `※各枠(40%/+10%/P&G500pt)は月1回の通算枠。複数商品を同時に対象にすると枠は共有されるため、実際は「主役1商品＋おしりふき等」の1会計として『組み合わせ計算』タブでご確認を。`;
+    `※各枠(40%/+10%/P&G500pt)は月1回の通算枠。複数商品を同時に対象にすると枠は共有されるため、実際は「主役1商品＋おしりふき等」の1会計として『組み合わせ計算』タブでご確認を。<br>`+
+    `<span style="color:#c23b5b">★グーン（ウエルシア20%）について：この還元は「1会計で対象商品3点以上かつ合計2,500円(税込)以上」が条件です。おむつだけで足りない場合は、<b>アテント・エリス・ナチュラや、アサヒ・LION・ムヒ・アリナミンなど他のキャンペーン対象商品と合算して2,500円以上</b>にしてください（5,000円以上で1,000pt満額）。ウエルシアアプリでの事前エントリーが必須、上限は1会計1,000ptです。</span>`;
 }
 
 /* ================= 組み合わせ計算 ================= */
 const comboQty = {}; // index -> qty
 
 function comboCalc(){
-  let total=0, pampSub=0, bonusSub=0, pgSub=0, items=0;
+  let total=0, pampSub=0, bonusSub=0, pgSub=0, welSub=0, items=0;
   products.forEach((p,i)=>{
     const q = comboQty[i]||0;
     if(!q) return;
@@ -342,6 +348,7 @@ function comboCalc(){
     if(p.campaign) pampSub += sub;
     if(p.bonus10)  bonusSub += sub;
     if(p.brand==='P&G') pgSub += sub;
+    if(p.welcia20) welSub += sub;
   });
   const hasCamp = pampSub>0;
   const pt  = hasCamp ? Math.round((total-1)/WELKATSU) : Math.round(total/WELKATSU);
@@ -349,8 +356,9 @@ function comboCalc(){
   const r40 = Math.min(Math.floor(pampSub*CAMP_RATE), CAMP_CAP);
   const r10 = Math.min(Math.floor(bonusSub*BONUS_RATE), BONUS_CAP);
   const r500 = pgSub>=PG_MIN ? PG_BACK : 0;
-  const reward = r40+r10+r500;
-  return {total,pampSub,bonusSub,pgSub,items,pt,pay,r40,r10,r500,reward,real:Math.round(pt+pay-reward),hasCamp};
+  const rWel = welSub>0 ? Math.min(Math.floor(welSub*WEL_RATE), WEL_CAP) : 0;
+  const reward = r40+r10+r500+rWel;
+  return {total,pampSub,bonusSub,pgSub,welSub,items,pt,pay,r40,r10,r500,rWel,reward,real:Math.round(pt+pay-reward),hasCamp};
 }
 
 function renderCombo(){
@@ -359,7 +367,8 @@ function renderCombo(){
   products.forEach((p,i)=>{
     if(!p.available) return;
     const q=comboQty[i]||0;
-    const tag = p.campaign ? `<span class="badge">${p.bonus10?'50%':'40%'}</span>` : '';
+    const tag = (p.campaign ? `<span class="badge">${p.bonus10?'50%':'40%'}</span>` : '')
+              + (p.welcia20 ? `<span class="badge">ウエルシア20%</span>` : '');
     h+=`<div class="citem${q>0?' on':''}">
       <div class="ci-info">
         <div class="ci-name">${p.name}${tag}</div>
@@ -399,8 +408,9 @@ function renderBar(){
     </div>
     <div class="cdetail">
       支払い：ウエル活 <b>${yen(c.pt)}pt</b>${c.hasCamp?` ＋ 楽天ペイ <b>${c.pay}円</b>`:''}<br>
-      戻り：40%<b>−${yen(c.r40)}</b>${c.r10?` ／ +10%<b>−${yen(c.r10)}</b>`:''}${c.r500?` ／ P&amp;G500<b>−500</b>`:''} pt
+      戻り：40%<b>−${yen(c.r40)}</b>${c.r10?` ／ +10%<b>−${yen(c.r10)}</b>`:''}${c.r500?` ／ P&amp;G500<b>−500</b>`:''}${c.rWel?` ／ ウエルシア20%<b>−${yen(c.rWel)}</b>`:''} pt
       ${c.pgSub>0 && c.pgSub<PG_MIN?`<br><span style="color:#c23b5b">※P&amp;Gあと${yen(PG_MIN-c.pgSub)}円で+500pt</span>`:''}
+      ${c.welSub>0 && c.welSub<2500?`<br><span style="color:#c23b5b">※ウエルシア20%は3点以上かつ2,500円以上が条件。他の対象商品と合算であと${yen(2500-c.welSub)}円</span>`:''}
       ${c.r40>=CAMP_CAP?`<br><span style="color:#c23b5b">※40%が上限1000ptに到達</span>`:''}
     </div>
   </div>`;
@@ -423,7 +433,7 @@ function switchMode(m){
 /* ================= 値段・枚数の編集 ================= */
 function renderEditTable(){
   const t = document.getElementById('editTable');
-  let h = `<tr><th>商品</th><th>メーカー</th><th>40%</th><th>+10%</th><th>販売</th>
+  let h = `<tr><th>商品</th><th>メーカー</th><th>40%</th><th>+10%</th><th>ウエル20%</th><th>販売</th>
     <th>1個</th><th>2個</th><th>3個</th>`;
   SIZES.forEach(s=>h+=`<th>${s.label}</th>`);
   h+=`</tr>`;
@@ -433,6 +443,7 @@ function renderEditTable(){
       <td><input class="pname" style="width:74px" data-i="${i}" data-f="brand" value="${p.brand||''}"></td>
       <td><input type="checkbox" data-i="${i}" data-f="campaign" ${p.campaign?'checked':''}></td>
       <td><input type="checkbox" data-i="${i}" data-f="bonus10" ${p.bonus10?'checked':''}></td>
+      <td><input type="checkbox" data-i="${i}" data-f="welcia20" ${p.welcia20?'checked':''}></td>
       <td><input type="checkbox" data-i="${i}" data-f="available" ${p.available?'checked':''}></td>
       <td><input type="number" step="0.1" data-i="${i}" data-f="p1" value="${p.p1??''}"></td>
       <td><input type="number" step="0.1" data-i="${i}" data-f="p2" value="${p.p2??''}"></td>
