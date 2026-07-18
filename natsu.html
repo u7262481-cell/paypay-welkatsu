@@ -282,7 +282,8 @@ function recalc(){
 
   // 必要WAON POINT（ウエル活は1.5倍）／付与ポイント／還元率
   const getPt = total>=5000?1000: total>=2500?250:0;
-  document.getElementById('needP').textContent = Math.floor(total/1.5).toLocaleString();
+  // 必要ポイント＝税込の小数を切り捨て→1.5で割る→四捨五入
+  document.getElementById('needP').textContent = Math.round(Math.floor(total)/1.5).toLocaleString();
   document.getElementById('getP').textContent = getPt.toLocaleString();
   document.getElementById('rate').textContent = total>0 ? (getPt/total*100).toFixed(1) : '0';
 
