@@ -78,7 +78,7 @@ h1{font-family:'Shippori Mincho',serif;font-size:2rem;color:var(--rose);margin:6
 .split .val{font-family:'Shippori Mincho',serif;font-size:1.2rem;margin-top:2px}
 .split .b1 .val{color:var(--rose)}.split .b2 .val{color:var(--sage)}.split .b3 .val{color:var(--gold)}
 .split .val small{font-size:.66rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
-@media(max-width:560px){.split .val{font-size:1rem}.split .lbl{font-size:.62rem}}
+@media(max-width:560px){.split{grid-template-columns:1fr 1fr;gap:6px}.split .val{font-size:1rem}.split .lbl{font-size:.62rem}.split .box{padding:7px 6px}}
 .progress{height:14px;background:var(--rose-bg);border-radius:20px;overflow:hidden;position:relative}
 .progress .fill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--rose-soft),var(--rose),var(--gold));transition:width .4s ease}
 .status{margin-top:9px;font-size:.92rem;font-weight:500;text-align:center;min-height:1.5em}
@@ -131,7 +131,9 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
     <div class="note">
       ※ 対象商品を<b>1会計で3点以上</b>購入が条件 ／ <b>エントリー必須</b> ／ 期間 6/1〜<b>8/2</b>（7月も継続中）／
       還元は最大20回まで ／ 1pt＝1円相当のWAON POINT（9月上旬付与）。<br>
-      7月は<b>虫よけ（マモルーム等）</b>も対象。ウィルキンソン炭酸などもまとめ買いで組み合わせ可。<br>
+      <b>実質＝必要WAON POINT −（夏ボ付与＋レシチャレ＋ボーナス）</b>／お得率＝(合計−実質)÷合計。<br>
+      レシチャレ・ボーナスPは<b>ブルゾンさんの投稿で確認できた商品のみ</b>表示しています（未表示＝未確認）。<br>
+      ダヴは<b>まとめ買い対象外</b>（複数買うときはレシートを分ける）／モンダミンは5個までまとめ買いok。<br>
       正確な対象商品・条件は店頭・公式キャンペーンページで必ずご確認ください。
     </div>
   </div>
@@ -162,8 +164,11 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
     </div>
     <div class="split">
       <div class="box b1"><div class="lbl">必要WAON POINT</div><div class="val"><span id="needP">0</span><small> P</small></div></div>
-      <div class="box b2"><div class="lbl">付与ポイント</div><div class="val"><span id="getP">0</span><small> pt</small></div></div>
-      <div class="box b3"><div class="lbl">還元率</div><div class="val"><span id="rate">0</span><small> %</small></div></div>
+      <div class="box b2"><div class="lbl">夏ボ付与</div><div class="val"><span id="getP">0</span><small> pt</small></div></div>
+      <div class="box b2"><div class="lbl">レシチャレ戻り</div><div class="val"><span id="reshiP">0</span><small> P</small></div></div>
+      <div class="box b2"><div class="lbl">ボーナス戻り</div><div class="val"><span id="bonusP">0</span><small> P</small></div></div>
+      <div class="box b1"><div class="lbl">実質</div><div class="val"><span id="jissitu">0</span><small> 円</small></div></div>
+      <div class="box b3"><div class="lbl">お得率</div><div class="val"><span id="rate">0</span><small> %オフ</small></div></div>
     </div>
     <div class="progress"><div class="fill" id="fill"></div></div>
     <div class="status" id="status">商品を選んでね♪</div>
@@ -173,6 +178,12 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
 
 <script>
 const PRODUCTS = [
+  // ダヴ パールシャイン（6/1〜7/30・まとめ買い対象外＝レシートを分ける・1日5回まで）
+  {cat:"ダヴ パールシャイン", name:"ダヴ パールシャイン チューブ洗顔", price:712, reshi:202, camps:["レシチャレ"]},
+  {cat:"ダヴ パールシャイン", name:"ダヴ パールシャイン クレンジングオイル", price:1408, reshi:400, camps:["レシチャレ"]},
+  {cat:"ダヴ パールシャイン", name:"【セット購入】チューブ洗顔＋クレンジングオイル", price:2120, reshi:700, camps:["レシチャレ"]},
+  // オーラルケア（新商品・6/26〜7/25・5個までまとめ買いok）
+  {cat:"オーラルケア", name:"プラスワンモンダミン 口内トータルケア", price:877.8, reshi:320, bonus:120, camps:["レシチャレ","ボーナス"]},
   // 食品（夏の大還元祭のみ）
   {cat:"食品・オイル", name:"日清 こめ油 600g", price:537, camps:[]},
   {cat:"食品・オイル", name:"日清 ヘルシーごま油 350g", price:494, camps:[]},
@@ -193,8 +204,8 @@ const PRODUCTS = [
   {cat:"美容（グレイスワン）", name:"グレイスワン エッセンス", price:3520, camps:["レシチャレ"]},
   {cat:"美容（グレイスワン）", name:"グレイスワン ナイトリペアクリーム", price:3850, camps:["レシチャレ"]},
   // 虫よけ・殺虫（7月の夏の対象）
-  {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 玄関用", price:932, camps:["レシチャレ"]},
-  {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 複数パック", price:1848, camps:["レシチャレ"]},
+  {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 玄関用", price:932, reshi:300, bonus:80, camps:["レシチャレ","ボーナス"]},
+  {cat:"虫よけ・殺虫（夏の対象）", name:"アース マモルーム 吊るだけプレート 複数パック", price:1848, reshi:600, bonus:160, camps:["レシチャレ","ボーナス"]},
   // おむつ（7月はまとめ買い割引なし・1個あたり定価）
   {cat:"おむつ", name:"グーン おむつ", price:1427.8, camps:["20%還元"]},
 ];
@@ -233,7 +244,9 @@ function render(){
     PRODUCTS.forEach((p,i)=>{
       if(p.cat!==cat) return;
       const tags = `<span class="tag main">夏の大還元祭</span>` +
-        p.camps.map(c=>`<span class="tag sub">${c}</span>`).join('');
+        (p.reshi?`<span class="tag sub">レシチャレ ${p.reshi}P</span>`:'') +
+        (p.bonus?`<span class="tag sub">ボーナス ${p.bonus}P</span>`:'') +
+        p.camps.filter(c=>c!=='レシチャレ'&&c!=='ボーナス').map(c=>`<span class="tag sub">${c}</span>`).join('');
       let priceHtml;
       if(p.tiered){
         if(qty[i]>0){
@@ -280,12 +293,21 @@ function recalc(){
   const fill=document.getElementById('fill');
   fill.style.width=Math.min(100,total/5000*100)+'%';
 
-  // 必要WAON POINT（ウエル活は1.5倍）／付与ポイント／還元率
+  // 必要ポイント＝税込÷1.5の切り捨て（ブルゾンさん投稿の支払いptと全件一致）
+  const needPt = Math.floor(total/1.5);
   const getPt = total>=5000?1000: total>=2500?250:0;
-  // 必要ポイント＝税込の小数を切り捨て→1.5で割る→四捨五入
-  document.getElementById('needP').textContent = Math.round(Math.floor(total)/1.5).toLocaleString();
+  // レシチャレ・ボーナスの戻り合計
+  let reshiSum=0, bonusSum=0;
+  PRODUCTS.forEach((p,i)=>{ if(qty[i]>0){ reshiSum += (p.reshi||0)*qty[i]; bonusSum += (p.bonus||0)*qty[i]; } });
+  // 実質＝必要ポイント −（夏ボ付与＋レシチャレ＋ボーナス）
+  const jissitu = needPt - getPt - reshiSum - bonusSum;
+  document.getElementById('needP').textContent = needPt.toLocaleString();
   document.getElementById('getP').textContent = getPt.toLocaleString();
-  document.getElementById('rate').textContent = total>0 ? (getPt/total*100).toFixed(1) : '0';
+  document.getElementById('reshiP').textContent = reshiSum.toLocaleString();
+  document.getElementById('bonusP').textContent = bonusSum.toLocaleString();
+  document.getElementById('jissitu').textContent = jissitu.toLocaleString();
+  // お得率＝(合計税込 − 実質) ÷ 合計税込
+  document.getElementById('rate').textContent = total>0 ? ((total-jissitu)/total*100).toFixed(1) : '0';
 
   const st=document.getElementById('status'); st.className='status';
   if(total>=5000){
