@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ウエル活 × PayPayクーポン 支払い内訳シミュレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6F1;--card:#FFFFFF;--rose:#C98B8B;--rose-soft:#EBC9C6;--rose-bg:#F7E7E4;
+  --sage:#9DB29A;--sage-bg:#E8EEE6;--gold:#C7A063;--ink:#5A4A45;--ink-soft:#8C7B74;--line:#EDE2DB;
+  --pp:#E60012;--pp-bg:#FDEAEA;--waon:#0F8FD6;--waon-bg:#E6F3FB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Zen Maru Gothic',sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,#FBF6F1 0%,#F6ECE6 100%);background-attachment:fixed;line-height:1.7;padding-bottom:300px}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header{text-align:center;padding:38px 16px 20px}
+.eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--gold);font-weight:700}
+h1{font-family:'Shippori Mincho',serif;font-size:1.55rem;color:var(--rose);margin:6px 0 4px;letter-spacing:.03em;line-height:1.4}
+.subtitle{color:var(--ink-soft);font-size:.9rem}
+.rule-card{background:var(--card);border-radius:22px;padding:18px 20px;margin:16px 0;box-shadow:0 8px 24px rgba(201,139,139,.10);border:1px solid var(--line)}
+.rule-card h2{font-family:'Shippori Mincho',serif;font-size:1.02rem;color:var(--rose);margin-bottom:8px}
+.rule-card ul{list-style:none;font-size:.85rem;color:var(--ink)}
+.rule-card li{padding:3px 0 3px 18px;position:relative}
+.rule-card li::before{content:"♦";color:var(--gold);position:absolute;left:0;font-size:.7rem;top:6px}
+.rule-card b{color:var(--rose)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.85rem;background:var(--sage-bg);padding:10px 14px;border-radius:12px}
+.toggle-row label{cursor:pointer;user-select:none}
+.cat{font-family:'Shippori Mincho',serif;font-size:1.05rem;color:var(--sage);margin:24px 0 12px;display:flex;align-items:center;gap:10px}
+.cat::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sage)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(201,139,139,.07);display:flex;flex-direction:column;gap:9px;transition:.15s}
+.card.active{box-shadow:0 8px 22px rgba(201,139,139,.22);transform:translateY(-2px);border-color:var(--rose-soft)}
+.card .name{font-weight:700;font-size:.92rem;line-height:1.4}
+.card .maker{font-size:.72rem;color:var(--ink-soft);margin-top:-4px}
+.card .price{font-family:'Shippori Mincho',serif;font-size:1.3rem;color:var(--rose);display:flex;align-items:baseline;gap:2px}
+.card .price small{font-size:.7rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.price-in{font-family:'Shippori Mincho',serif;font-size:1.3rem;color:var(--rose);background:none;border:none;border-bottom:1.5px dashed var(--rose-soft);
+  width:5.2em;padding:0 2px;outline:none;-moz-appearance:textfield}
+.price-in::-webkit-outer-spin-button,.price-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.price-in::placeholder{color:#DCC7C0}
+.price-in:focus{border-bottom-color:var(--rose)}
+.card .reci{font-size:.7rem;color:var(--sage);background:var(--sage-bg);border-radius:8px;padding:2px 8px;align-self:flex-start}
+.card .reci.bns{color:#B08A3E;background:#FBF2DF}
+.card .pbadge{font-size:.7rem;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:2px 8px;align-self:flex-start}
+.card .note{font-size:.68rem;color:#B5726F;background:#FBEFEC;border-radius:8px;padding:3px 8px;line-height:1.5}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.stepper .qty{font-family:'Shippori Mincho',serif;font-size:1.15rem;min-width:34px;text-align:center}
+.btn{width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;font-size:1.25rem;background:var(--rose-bg);color:var(--rose);font-weight:700;transition:.12s;display:flex;align-items:center;justify-content:center}
+.btn:hover{background:var(--rose);color:#fff}.btn:active{transform:scale(.9)}
+.btn.minus{background:#F1EAE6;color:var(--ink-soft)}.btn.minus:hover{background:var(--ink-soft);color:#fff}
+.add-lead{font-size:.82rem;color:var(--ink-soft);margin-bottom:12px}
+.add-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inp{font-family:'Zen Maru Gothic';font-size:.9rem;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;background:#FCF8F5;color:var(--ink);outline:none}
+.inp:focus{border-color:var(--rose-soft)}.inp::placeholder{color:#C9B8B0}
+#cName{flex:1;min-width:130px}.price-inp{width:108px}.qty-inp{width:60px;text-align:center}
+.card .price-inp{width:100%;padding:7px 10px;font-size:.88rem}
+.add-btn{border:none;background:var(--rose);color:#fff;font-family:'Zen Maru Gothic';font-weight:700;border-radius:14px;padding:10px 18px;cursor:pointer;font-size:.9rem;transition:.12s}
+.add-btn:hover{background:#b87a7a}.add-btn:active{transform:scale(.96)}
+.custom-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.custom-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--rose-bg);border-radius:12px;padding:9px 14px;font-size:.86rem}
+.custom-item .ci-sum{font-family:'Shippori Mincho',serif;color:var(--rose)}
+.ci-del{border:none;background:none;color:var(--ink-soft);font-size:1.1rem;cursor:pointer;padding:0 4px}.ci-del:hover{color:var(--rose)}
+.reset{display:block;margin:18px auto 0;background:none;border:1px solid var(--rose-soft);color:var(--rose);border-radius:20px;padding:8px 22px;font-family:'Zen Maru Gothic';font-size:.85rem;cursor:pointer}
+.reset:hover{background:var(--rose-bg)}
+footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16px 0}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(201,139,139,.14);padding:14px 16px 16px;z-index:20}
+.bar-in{max-width:860px;margin:0 auto}
+.bar-total{text-align:center;margin-bottom:8px}
+.bar-total .t{font-family:'Shippori Mincho',serif;font-size:1.5rem;color:var(--rose)}
+.bar-total .t small{font-size:.78rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.bar-total .cnt{font-size:.78rem;color:var(--ink-soft);margin-left:8px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.split .box{border-radius:14px;padding:10px 12px;text-align:center}
+.split .pp{background:var(--pp-bg)}.split .wa{background:var(--waon-bg)}
+.split .lbl{font-size:.72rem;font-weight:700}
+.split .pp .lbl{color:var(--pp)}.split .wa .lbl{color:var(--waon)}
+.split .val{font-family:'Shippori Mincho',serif;font-size:1.45rem;margin-top:2px}
+.split .pp .val{color:var(--pp)}.split .wa .val{color:var(--waon)}
+.split .val small{font-size:.7rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+.status{font-size:.86rem;text-align:center;min-height:1.4em;color:var(--ink)}
+.status .hl{font-family:'Shippori Mincho',serif;color:var(--rose);font-size:1.05rem}
+.status.win{color:var(--sage)}.status.win .hl{color:var(--sage)}
+.reward-line{text-align:center;font-size:.84rem;color:var(--gold);font-weight:700;margin-top:4px}
+.jisshitsu{margin-top:8px;text-align:center;font-family:'Shippori Mincho',serif;font-size:1.25rem;color:var(--rose);min-height:1em}
+.jisshitsu.kuroji{color:var(--sage)}
+.jisshitsu small{font-size:.72rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+.serif{margin-top:10px;background:var(--sage-bg);border:1px dashed var(--sage);border-radius:14px;padding:10px 14px;text-align:center;font-size:.9rem;color:var(--ink);display:none}
+.serif.show{display:block}
+.serif .q{font-family:'Shippori Mincho',serif;color:var(--sage);font-weight:700}
+.serif .lead{font-size:.72rem;color:var(--ink-soft);display:block;margin-bottom:4px}
+.serif .hlp{color:var(--waon);font-weight:700}.serif .hpp{color:var(--pp);font-weight:700}
+@media(max-width:560px){.grid{grid-template-columns:1fr}h1{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">PayPayクーポン × ウエル活</div>
+    <h1>ウエル活 × PayPayクーポン<br>支払い内訳シミュレーター</h1>
+    <p class="subtitle">PayPayでいくら・WAON POINTでいくら払えばトクするかを計算♪</p>
+  </header>
+
+  <div class="rule-card">
+    <h2>🎀 PayPayクーポンのしくみ</h2>
+    <ul>
+      <li>ウエルシアグループで使える<b>商品限定クーポン</b>。対象商品を買うとPayPayポイントで還元</li>
+      <li><b>支払い前にクーポンを「獲得」</b>しておくのが必須（レシート提出はなし）</li>
+      <li>期間は<b>商品によって異なる</b>／他のクーポン・キャンペーンと<b>併用可</b></li>
+      <li>利用回数は<b>各クーポン3回まで</b>（クーポンにより無制限などもあり）。<b>3会計あわせて上限10,000P</b></li>
+      <li>付与は<b>支払翌日から30日後</b></li>
+      <li>PayPayポイントは<b>PayPay決済額の66.5%が上限</b>。だから満額もらうにはPayPayを「還元額÷0.665」以上払い、残りをWAON POINTにするのが◎</li>
+    </ul>
+    <div class="toggle-row">
+      <input type="checkbox" id="welka" checked onchange="recalc()">
+      <label for="welka">ウエル活デー（20日）＝WAON POINT 1.5倍で計算する</label>
+    </div>
+    <div class="toggle-row" style="background:var(--rose-bg)">
+      価格はお店で確認して、カードに<b>税込価格</b>を入力してね♪
+    </div>
+  </div>
+
+  <div id="catalog"></div>
+
+  <div class="cat">自分で追加</div>
+  <div class="rule-card add-card">
+    <p class="add-lead">リストにないクーポン対象商品を追加できます♪（還元率も入力してね）</p>
+    <div class="add-form">
+      <input id="cName" class="inp" type="text" placeholder="商品名（任意）">
+      <input id="cPrice" class="inp price-inp" type="number" inputmode="numeric" placeholder="価格(税込)" min="0">
+      <input id="cRate" class="inp qty-inp" type="number" inputmode="numeric" placeholder="還元%" min="0">
+      <input id="cReci" class="inp price-inp" type="number" inputmode="numeric" placeholder="レシチャレP(任意)" min="0">
+      <input id="cQty" class="inp qty-inp" type="number" inputmode="numeric" value="1" min="1">
+      <button class="add-btn" onclick="addCustom()">＋ 追加</button>
+    </div>
+    <div id="customList" class="custom-list"></div>
+  </div>
+
+  <button class="reset" onclick="resetAll()">えらんだ商品をリセット</button>
+  <footer>レシチャレ・WAONボーナスPは<b>確認できた商品のみ</b>表示・計算しています（未表示＝未確認）。<br>「夏のボーナス大還元祭20%」は条件付きのため実質計算に含めていません。<br>クーポン一覧は7月時点のもので、配信状況・対象商品・期間は変わることがあります。<br>スクラビングバブル（ジョンソン）は対象クーポンが2種類配信されています。<br>PayPay／WAON POINTの内訳は目安で、端数や店舗により実際と異なる場合があります。<br>最新の条件はPayPayアプリのクーポン画面をご確認ください。<br>うーまま ウエル活×PayPayクーポン シミュレーター</footer>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="bar-total"><span class="t"><span id="total">0</span><small> 円(税込)</small></span><span class="cnt">／ <b id="count">0</b>点</span></div>
+    <div class="split">
+      <div class="box pp"><div class="lbl">PayPayで支払う</div><div class="val"><span id="pp">0</span><small> 円</small></div></div>
+      <div class="box wa"><div class="lbl">WAON POINTで支払う</div><div class="val"><span id="wa">0</span><small> P</small></div></div>
+    </div>
+    <div class="status" id="status">対象商品を選んでね♪</div>
+    <div class="reward-line" id="reward"></div>
+    <div class="jisshitsu" id="jisshitsu"></div>
+    <div class="serif" id="serif"></div>
+  </div>
+</div>
+
+<script>
+/* 2026年7月 ウエルシアで使えるPayPayクーポン（還元率は「付与(最大)」表記）
+   価格は店舗・商品により異なるため、ユーザー入力にしています */
+const PRODUCTS = [
+  // 30%
+  {cat:"30%還元", name:"ザバス BIOPRO ホエイプロテイン100", maker:"明治", rate:0.30},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 大容量72枚", maker:"エリエール（大王製紙）", rate:0.30, price:580, bonus:100},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 通常パック", maker:"エリエール（大王製紙）", rate:0.30, price:327.8, bonus:50},
+  {cat:"30%還元", name:"ナチュラ さら肌さらり 吸水ケアナプキン 50cc", maker:"エリエール（大王製紙）", rate:0.30, price:547.8, bonus:50},
+  // 20%
+  {cat:"20%還元", name:"完全メシ 各種", maker:"日清食品", rate:0.20},
+  {cat:"20%還元", name:"フィニッシュ タブレット", maker:"レキットベンキーザー", rate:0.20},
+  {cat:"20%還元", name:"ゴキブリムエンダー 40プッシュ", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:1628, reci:600},
+  {cat:"20%還元", name:"ゴキブリムエンダー 100プッシュ", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:3058, reci:1130},
+  {cat:"20%還元", name:"コンバット キャップ 1年用", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:1097.8, reci:400},
+  {cat:"20%還元", name:"コンバット スマートタイプ 1年用", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:1628, reci:600},
+  {cat:"20%還元", name:"コンバット 1年用", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:877.8, reci:320},
+  {cat:"20%還元", name:"シンカトリ 本体セット", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:1408, reci:640, bonus:130},
+  {cat:"20%還元", name:"シンカトリ 取替カートリッジ", maker:"KINCHO（大日本除虫菊）", rate:0.20, price:1078, reci:300},
+  {cat:"20%還元", name:"ドクターシーラボ 各種", maker:"JNTLコンシューマーヘルス", rate:0.20},
+  {cat:"20%還元", name:"ALPRON SOY 各種", maker:"アルプロン", rate:0.20},
+  {cat:"20%還元", name:"プロアクティブ トライアルセット", maker:"ザ・プロアクティブカンパニー", rate:0.20, price:2970, reci:800},
+  {cat:"20%還元", name:"スクラビングバブル 各種", maker:"ジョンソン", rate:0.20},
+  {cat:"20%還元", name:"ラカントS シリーズ", maker:"サラヤ", rate:0.20},
+  {cat:"20%還元", name:"It's シャンプー／トリートメント", maker:"ネイチャーラボ", rate:0.20, price:1427.8, reci:650},
+  {cat:"20%還元", name:"It's 増量セット", maker:"ネイチャーラボ", rate:0.20, price:3278, note:"JAN要確認 4582469496700／4582469496717", reci:1200, bonus:300},
+  {cat:"20%還元", name:"チキンナゲット", maker:"日本ハム", rate:0.20},
+  {cat:"20%還元", name:"N organic 製品各種", maker:"Nオーガニック（シロク）", rate:0.20},
+  // 10%
+  {cat:"10%還元", name:"Yunth 美容液 各種", maker:"Yunth（AIロボティクス）", rate:0.10},
+  {cat:"10%還元", name:"Yunth シートマスク", maker:"Yunth（AIロボティクス）", rate:0.10},
+  {cat:"10%還元", name:"ラサーナ 海藻ヘアエッセンス", maker:"La Sana（ヤマサキ）", rate:0.10},
+  {cat:"10%還元", name:"い・ろ・は・す 540ml 1本", maker:"コカ・コーラ ボトラーズ", rate:0.10, price:84.24, note:"クーポン対象は540mlのみ"},
+  {cat:"10%還元", name:"い・ろ・は・す 540ml ケース24本", maker:"コカ・コーラ ボトラーズ", rate:0.10, price:1941.84},
+  {cat:"10%還元", name:"カゴメ トマトジュース 各種", maker:"カゴメ", rate:0.10},
+  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用", maker:"アース製薬", rate:0.10, price:932.8, note:"あみ戸用プレートはPayPay対象外", reci:340, bonus:80},
+  {cat:"10%還元", name:"マモルーム 虫よけ 9ヵ月用 2個入", maker:"アース製薬", rate:0.10, price:1848, reci:680, bonus:160},
+  {cat:"10%還元", name:"ジュレリッチ リュール 各種", maker:"全薬販売", rate:0.10},
+  {cat:"10%還元", name:"RESTA 洗顔・クレンジング 各種", maker:"ロート製薬", rate:0.10},
+  {cat:"10%還元", name:"食品にも使えるアルコール 各種", maker:"フマキラー", rate:0.10},
+  {cat:"10%還元", name:"コラージュフルフル 液体石鹸 各種", maker:"持田ヘルスケア", rate:0.10},
+  // 定額
+  {cat:"定額還元", name:"糖質オフタイプ 6本入", maker:"ヤクルト本社", rate:0, fixedPt:20},
+];
+const qty   = PRODUCTS.map(()=>0);
+const price = PRODUCTS.map(p=>p.price||0);
+let customItems = [];
+
+const CAP=0.665, PCAP=10000;
+
+function render(){
+  const cats=[...new Set(PRODUCTS.map(p=>p.cat))];
+  const root=document.getElementById('catalog'); root.innerHTML='';
+  cats.forEach(cat=>{
+    const h=document.createElement('div'); h.className='cat'; h.textContent=cat; root.appendChild(h);
+    const g=document.createElement('div'); g.className='grid';
+    PRODUCTS.forEach((p,i)=>{
+      if(p.cat!==cat)return;
+      const pt = p.fixedPt ? p.fixedPt : Math.floor((price[i]||0)*p.rate);
+      const rateTxt = p.fixedPt?`${p.fixedPt}P還元`:`${Math.round(p.rate*100)}%還元`;
+      const badge = (price[i]>0||p.fixedPt) ? `${rateTxt}で+${pt.toLocaleString()}P` : `PayPayクーポン ${rateTxt}`;
+      const card=document.createElement('div'); card.className='card'+(qty[i]>0?' active':'');
+      card.innerHTML=`<div class="name">${p.name}</div>
+        <div class="maker">${p.maker}</div>
+        <div class="price"><input class="price-in" type="number" inputmode="decimal" min="0" step="0.01"
+          placeholder="ー" value="${price[i]||''}" oninput="setPrice(${i},this.value)"><small> 円(税込)</small></div>
+        <div class="pbadge" id="badge${i}">${badge}</div>
+        ${p.reci?`<div class="reci">レシチャレ併用で+${p.reci.toLocaleString()}P還元</div>`:''}
+        ${p.bonus?`<div class="reci bns">WAONボーナス +${p.bonus.toLocaleString()}P</div>`:''}
+        ${p.note?`<div class="note">⚠ ${p.note}</div>`:''}
+        <div class="stepper">
+          <button class="btn minus" onclick="dec(${i})">−</button>
+          <span class="qty">${qty[i]}</span>
+          <button class="btn" onclick="inc(${i})">＋</button>
+        </div>`;
+      g.appendChild(card);
+    });
+    root.appendChild(g);
+  });
+}
+function setPrice(i,v){
+  price[i]=parseFloat(v)||0;
+  const p=PRODUCTS[i], b=document.getElementById('badge'+i);
+  if(b){
+    const pt = p.fixedPt ? p.fixedPt : Math.floor(price[i]*p.rate);
+    const rateTxt = p.fixedPt?`${p.fixedPt}P還元`:`${Math.round(p.rate*100)}%還元`;
+    b.textContent = (price[i]>0||p.fixedPt) ? `${rateTxt}で+${pt.toLocaleString()}P` : `PayPayクーポン ${rateTxt}`;
+  }
+  recalc();
+}
+function inc(i){qty[i]++;render();recalc()}
+function dec(i){if(qty[i]>0)qty[i]--;render();recalc()}
+function resetAll(){qty.fill(0);price.fill(0);customItems=[];render();renderCustom();recalc()}
+
+function addCustom(){
+  const n=document.getElementById('cName'),p=document.getElementById('cPrice'),r=document.getElementById('cRate'),q=document.getElementById('cQty'),rc=document.getElementById('cReci');
+  const pr=parseFloat(p.value);let qq=parseInt(q.value,10);const rt=(parseFloat(r.value)||0)/100;
+  const rci=parseInt(rc.value,10)||0;
+  if(!pr||pr<=0){p.focus();p.style.borderColor='#C9736B';return;}
+  if(!qq||qq<1)qq=1;
+  customItems.push({name:n.value.trim()||'追加商品',price:pr,qty:qq,rate:rt,reci:rci});
+  n.value='';p.value='';r.value='';q.value='1';rc.value='';p.style.borderColor='';
+  renderCustom();recalc();
+}
+function removeCustom(i){customItems.splice(i,1);renderCustom();recalc()}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderCustom(){
+  document.getElementById('customList').innerHTML=customItems.map((c,i)=>`
+    <div class="custom-item"><span>${escapeHtml(c.name)} <small style="color:var(--ink-soft)">¥${c.price.toLocaleString()}×${c.qty}・${Math.round(c.rate*100)}%${c.reci?`・レシチャレ${c.reci}P`:''}</small></span>
+    <span class="ci-sum">¥${Math.round(c.price*c.qty).toLocaleString()}</span>
+    <button class="ci-del" onclick="removeCustom(${i})">×</button></div>`).join('');
+}
+
+function recalc(){
+  let T=0,count=0,rawReward=0,reciTotal=0,bonusTotal=0;
+  PRODUCTS.forEach((p,i)=>{
+    if(qty[i]<=0)return;
+    const sub=(price[i]||0)*qty[i];
+    T+=sub;count+=qty[i];
+    rawReward += p.fixedPt ? p.fixedPt*qty[i] : Math.floor(sub*p.rate);
+    reciTotal += (p.reci||0)*qty[i];
+    bonusTotal += (p.bonus||0)*qty[i];
+  });
+  customItems.forEach(c=>{const sub=c.price*c.qty;T+=sub;count+=c.qty;rawReward+=Math.floor(sub*c.rate);reciTotal+=(c.reci||0)*c.qty;});
+  T=Math.round(T);
+  const waonMult=document.getElementById('welka').checked?1.5:1;
+  document.getElementById('total').textContent=T.toLocaleString();
+  document.getElementById('count').textContent=count;
+  const st=document.getElementById('status'),rw=document.getElementById('reward');
+  const ppEl=document.getElementById('pp'),waEl=document.getElementById('wa');
+  const sf=document.getElementById('serif'),ji=document.getElementById('jisshitsu');
+
+  if(count<=0){ppEl.textContent='0';waEl.textContent='0';st.className='status';st.textContent='対象商品を選んでね♪';rw.textContent='';ji.textContent='';ji.className='jisshitsu';sf.className='serif';return;}
+  if(T<=0){ppEl.textContent='—';waEl.textContent='—';st.className='status';st.textContent='えらんだ商品の税込価格を入力してね♪';rw.textContent='';ji.textContent='';ji.className='jisshitsu';sf.className='serif';return;}
+
+  const reward=Math.min(rawReward,PCAP);                 // 3会計あわせて上限10,000P
+  const payPay=Math.min(T,Math.ceil(reward/CAP));        // 66.5%ルールを満たす最小PayPay額
+  const waonYen=T-payPay;
+  const waonP=Math.round(waonYen/waonMult);
+  ppEl.textContent=payPay.toLocaleString();
+  waEl.textContent=waonP.toLocaleString();
+  st.className='status win';
+  st.innerHTML=`✓ PayPay <span class="hl">${payPay.toLocaleString()}円</span> ＋ WAON POINT <span class="hl">${waonP.toLocaleString()}P</span>`;
+  rw.innerHTML=`PayPayクーポン還元 約${reward.toLocaleString()}pt`+(rawReward>PCAP?'（上限10,000P到達）':'')
+    +(reciTotal>0?` ＋ レシチャレ ${reciTotal.toLocaleString()}P`:'')
+    +(bonusTotal>0?` ＋ WAONボーナス ${bonusTotal.toLocaleString()}P`:'');
+  const jisshitsu = payPay + waonP - reward - reciTotal - bonusTotal;
+  if(jisshitsu<0){
+    ji.className='jisshitsu kuroji';
+    ji.innerHTML=`⇒ 実質 ${Math.abs(jisshitsu).toLocaleString()}円 黒字！🎉`;
+  }else{
+    ji.className='jisshitsu';
+    ji.innerHTML=`⇒ 実質 ${jisshitsu.toLocaleString()}円 <small>(${count}点)</small>`;
+  }
+  sf.className='serif show';
+  sf.innerHTML=`<span class="lead">レジでこう唱えてね♪</span><span class="q">「<span class="hlp">WAON POINTを${waonP.toLocaleString()}P</span>で支払って、<span class="hpp">残りをPayPay</span>で支払います」</span>`;
+}
+render();renderCustom();recalc();
+</script>
+</body>
+</html>
