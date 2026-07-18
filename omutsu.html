@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>おむつ最安計算（ウエル活×楽天40%）</title>
+<style>
+  :root{
+    --bg:#fbf7f2; --card:#ffffff; --ink:#2b2b2b; --sub:#7a7167;
+    --line:#e7ded3; --accent:#e5738a; --accent2:#6aa9d8;
+    --gold:#c99a2e; --good:#2e9e6b; --chip:#f3eadf;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    line-height:1.5;font-size:15px;padding-bottom:60px}
+  header{background:linear-gradient(135deg,#f6c3cf,#f4d9b0);padding:16px 14px;
+    position:sticky;top:0;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  h1{margin:0;font-size:18px}
+  .meta{font-size:12px;color:#7a5c4a;margin-top:4px}
+  .wrap{max-width:760px;margin:0 auto;padding:14px}
+  .banner{background:#fff4e0;border:1px solid #f0d49a;border-radius:10px;
+    padding:10px 12px;font-size:12.5px;color:#8a6a2a;margin-bottom:14px}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--sub);
+    padding:7px 12px;border-radius:999px;font-size:13px;cursor:pointer;flex:0 0 auto}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+  .sizeHead{display:flex;align-items:baseline;gap:8px;margin:2px 2px 10px}
+  .sizeHead h2{margin:0;font-size:16px}
+  .sizeHead .best{font-size:12px;color:var(--good);font-weight:700}
+  .row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px}
+  .row+.row{border-top:1px solid var(--line)}
+  .row.top{background:#fdf1f3}
+  .rank{width:26px;height:26px;border-radius:50%;background:#eee;color:#555;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:0 0 auto}
+  .row.top .rank{background:var(--accent);color:#fff}
+  .info{flex:1;min-width:0}
+  .pname{font-weight:700;font-size:14px}
+  .psub{font-size:11.5px;color:var(--sub);margin-top:1px}
+  .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:6px;
+    background:#ffe1e8;color:#c23b5b;margin-left:6px;font-weight:700}
+  .price{text-align:right;flex:0 0 auto}
+  .per{font-size:17px;font-weight:800;color:var(--accent)}
+  .per small{font-size:11px;font-weight:600;color:var(--sub)}
+  .qty{font-size:11.5px;color:var(--sub);margin-top:1px}
+  details.bd{margin-top:6px}
+  details.bd summary{font-size:11.5px;color:var(--accent2);cursor:pointer;list-style:none}
+  details.bd summary::-webkit-details-marker{display:none}
+  .bdgrid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;font-size:12px;
+    margin-top:6px;color:#555}
+  .bdgrid b{color:#222}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  button.act{border:1px solid var(--line);background:#fff;border-radius:9px;
+    padding:8px 12px;font-size:13px;cursor:pointer;color:#444}
+  button.act.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+  .editWrap{overflow-x:auto}
+  table.edit{border-collapse:collapse;font-size:12px;min-width:640px}
+  table.edit th,table.edit td{border:1px solid var(--line);padding:4px 5px;text-align:center}
+  table.edit th{background:#f6efe6;position:sticky;top:0}
+  table.edit input[type=number]{width:52px;border:1px solid var(--line);border-radius:5px;
+    padding:3px;font-size:12px;text-align:right}
+  table.edit input.pname{width:120px;text-align:left}
+  table.edit td.name{text-align:left;white-space:nowrap}
+  .muted{color:var(--sub);font-size:12px}
+  .hide{display:none}
+  .foot{font-size:11.5px;color:var(--sub);text-align:center;margin-top:20px;line-height:1.7}
+  .modebar{display:flex;gap:8px;margin-bottom:12px}
+  .mode{flex:1;border:1px solid var(--line);background:#fff;color:var(--sub);
+    padding:11px 8px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer}
+  .mode.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .citem{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  .citem.on{background:#fdf1f3;border-color:var(--accent)}
+  .citem .ci-info{flex:1;min-width:0}
+  .citem .ci-name{font-weight:700;font-size:14px}
+  .citem .ci-sub{font-size:11.5px;color:var(--sub);margin-top:1px}
+  .stepper{display:flex;align-items:center;gap:0;flex:0 0 auto}
+  .stepper button{width:34px;height:34px;border:1px solid var(--line);background:#fff;
+    font-size:20px;line-height:1;cursor:pointer;color:var(--accent)}
+  .stepper button:first-child{border-radius:9px 0 0 9px}
+  .stepper button:last-child{border-radius:0 9px 9px 0}
+  .stepper .q{width:38px;text-align:center;font-weight:800;font-size:16px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);height:34px;line-height:34px}
+  .cbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--accent);
+    box-shadow:0 -3px 14px rgba(0,0,0,.1);padding:10px 14px 14px;z-index:20}
+  .cbar .cwrap{max-width:760px;margin:0 auto}
+  .cbar .ctop{display:flex;justify-content:space-between;align-items:baseline}
+  .cbar .cjishitsu{font-size:22px;font-weight:800;color:var(--accent)}
+  .cbar .cjishitsu small{font-size:12px;color:var(--sub);font-weight:600}
+  .cbar .cdetail{font-size:11.5px;color:#555;margin-top:5px;line-height:1.6}
+  .cbar .cdetail b{color:#222}
+</style>
+</head>
+<body>
+<header>
+  <h1>おむつ最安計算 🍼</h1>
+  <div class="meta">ウエル活(20日/1.5倍) × 楽天パンパース40%還元　｜　実質コスト＝支払い−還元</div>
+</header>
+
+<div class="wrap">
+  <div class="modebar">
+    <button class="mode active" id="mRank">🏆 サイズ別ランキング</button>
+    <button class="mode" id="mCombo">🧮 組み合わせ計算</button>
+  </div>
+
+  <div id="rankView">
+    <div class="tabs" id="tabs"></div>
+    <div id="results"></div>
+    <div class="foot" id="footNote"></div>
+  </div>
+
+  <div id="comboView" class="hide">
+    <div class="muted" style="margin:2px 2px 10px">
+      買う商品の個数を＋−で選ぶと、下に合計・ポイント払い・還元・実質が出ます。<br>
+      40%(上限1000pt)・+10%(上限400pt)は通算枠で共有。P&amp;G対象2,500円以上で+500pt併用込み。
+    </div>
+    <div id="comboList"></div>
+  </div>
+
+  <div class="foot" id="footNote2"></div>
+</div>
+
+<div id="comboBar" class="cbar hide"></div>
+
+<script>
+/* ================= データ ================= */
+const SIZES = [
+  {key:'newborn', label:'新生児'},
+  {key:'sTape',   label:'Sテープ'},
+  {key:'mTape',   label:'Mテープ'},
+  {key:'mPants',  label:'Mパンツ'},
+  {key:'L',       label:'L'},
+  {key:'big',     label:'BIG'},
+  {key:'bigPlus', label:'BIGより大きい'},
+];
+
+const DEFAULT_PRODUCTS = [
+  {name:"パンパース小", brand:"P&G", campaign:true, available:true,
+    p1:1738,p2:null,p3:null, c:{newborn:70,sTape:70,mTape:52,mPants:52,L:44,big:38,bigPlus:30}},
+  {name:"パンパース大", brand:"P&G", campaign:true, available:true,
+    p1:2728,p2:null,p3:null, c:{L:88,big:76,bigPlus:64}},
+  {name:"パンパース肌いち(肌へのいちばん)", brand:"P&G", campaign:true, available:true,
+    p1:1856.8,p2:null,p3:null, c:{newborn:60,sTape:54,mTape:46,mPants:46,L:36,big:34}},
+  {name:"パンパースおやすみパンツ小", brand:"P&G", campaign:true, bonus10:true, available:true,
+    p1:1848,p2:null,p3:null, c:{mPants:34,L:30,big:26,bigPlus:22}},
+  {name:"パンパースおやすみパンツ大", brand:"P&G", campaign:true, bonus10:true, available:true,
+    p1:2838,p2:null,p3:null, c:{L:56,big:42,bigPlus:36}},
+  {name:"超吸収エアリー(旧:超吸収スリム)", brand:"P&G", campaign:true, bonus10:true, available:true,
+    p1:1848,p2:null,p3:null, c:{L:34,big:32}},
+  {name:"おしりふき(肌いち 56枚×2P)", brand:"P&G", campaign:true, bonus10:true, available:true, noSize:true,
+    p1:583,p2:null,p3:null, c:{}},
+  {name:"メリーズ大", brand:"花王", campaign:false, available:true,
+    p1:1628,p2:1628,p3:1628, c:{newborn:82,sTape:74,mTape:62,mPants:62,L:54,big:46,bigPlus:32}},
+  {name:"メリーズ おやすみパンツ", brand:"花王", campaign:false, available:true,
+    p1:1628,p2:1540,p3:1485, c:{big:22}},
+  {name:"メリーズファーストプレミアム", brand:"花王", campaign:false, available:true,
+    p1:1482.8,p2:null,p3:null, c:{newborn:66,sTape:54,mTape:48,mPants:46,L:36,big:32}},
+  {name:"グーン", brand:"エリエール", campaign:false, available:true,
+    p1:1427.8,p2:1427.8,p3:1427.8, c:{newborn:68,sTape:62,mTape:52,mPants:66,L:56,big:50,bigPlus:34}},
+  {name:"ムーニー", brand:"ユニ・チャーム", campaign:false, available:true,
+    p1:1526.8,p2:null,p3:null, c:{newborn:76,sTape:70,mTape:56,mPants:48,L:40,big:36}},
+  {name:"マミーポコ小", brand:"ユニ・チャーム", campaign:false, available:true,
+    p1:1317.8,p2:1317.8,p3:null, c:{mPants:50,L:42,big:36,bigPlus:24}},
+  {name:"マミーポコ大", brand:"ユニ・チャーム", campaign:false, available:true,
+    p1:1738,p2:1738,p3:null, c:{mPants:74,L:62,big:54,bigPlus:36}},
+  {name:"genki", brand:"ネピア", campaign:false, available:false,
+    p1:99999,p2:null,p3:null, c:{mPants:52,L:44,big:38}},
+];
+
+/* ============== 設定（キャンペーン） ============== */
+const WELKATSU = 1.5;      // ウエル活 倍率
+const CAMP_RATE = 0.40;    // 40%還元
+const CAMP_CAP  = 1000;    // 40%還元 上限pt
+const BONUS_RATE = 0.10;   // +10%還元（おやすみパンツ/超吸収エアリー/おしりふき）
+const BONUS_CAP  = 400;    // +10%還元 上限pt
+const PG_MIN  = 2500;      // P&G夏のヒーロー大集合：対象2,500円以上で
+const PG_BACK = 500;       // 500pt還元（お一人1回）
+const PERIOD = "2026/7/16(木)〜8/31(月)　※ウエル活は毎月20日";
+
+/* ================= 状態 ================= */
+const products = DEFAULT_PRODUCTS;
+
+/* ================= 計算 ================= */
+function tierPrice(p,n){
+  if(n>=3 && p.p3) return p.p3;
+  if(n>=2 && p.p2) return p.p2;
+  return p.p1;
+}
+// 総額から：ウエル活必要pt・楽天ペイ額・還元・実質コスト
+function calc(total, campaign, bonus10){
+  if(campaign){
+    const pt = Math.round((total-1)/WELKATSU);
+    const pay = Math.round((total - pt*WELKATSU)*100)/100; // 1〜2円
+    const r40 = Math.min(Math.floor(total*CAMP_RATE), CAMP_CAP);
+    const r10 = bonus10 ? Math.min(Math.floor(total*BONUS_RATE), BONUS_CAP) : 0;
+    const reward = r40 + r10;
+    return {pt, pay, r40, r10, reward, real: Math.round(pt + pay - reward)};
+  }else{
+    const pt = Math.round(total/WELKATSU);
+    return {pt, pay:0, r40:0, r10:0, reward:0, real: pt};
+  }
+}
+// 商品×サイズ：組み合わせ込みで最安の買い方を探す
+// （複数個買い・40%/+10%上限・P&G2,500円→500pt を自動最適化）
+function bestForSize(p, sizeKey){
+  const count = p.c[sizeKey];
+  if(!p.available || !count) return null;
+  let best=null;
+  for(let n=1;n<=4;n++){
+    const total  = n * tierPrice(p,n);
+    const sheets = n * count;
+    const pamp  = p.campaign ? total : 0;
+    const bonus = p.bonus10  ? total : 0;
+    const pg    = (p.brand==='P&G') ? total : 0;
+    const hasCamp = pamp>0;
+    const pt  = hasCamp ? Math.round((total-1)/WELKATSU) : Math.round(total/WELKATSU);
+    const pay = hasCamp ? Math.max(1, Math.round(total - pt*WELKATSU)) : 0;
+    const r40 = Math.min(Math.floor(pamp*CAMP_RATE), CAMP_CAP);
+    const r10 = Math.min(Math.floor(bonus*BONUS_RATE), BONUS_CAP);
+    const r500 = pg>=PG_MIN ? PG_BACK : 0;
+    const real = Math.round(pt + pay - (r40+r10+r500));
+    const per = real / sheets;
+    // まとめ買いは1枚あたり0.1円以上安くなる時だけ採用（無駄な多買いを防ぐ）
+    if(!best || per < best.per - 0.1){
+      best = {n, total, sheets, per, pt, pay, r40, r10, r500, reward:r40+r10+r500, real};
+    }
+  }
+  return best;
+}
+
+/* ================= 描画 ================= */
+let activeSize = SIZES[4].key; // L 初期表示
+
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  SIZES.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='tab'+(s.key===activeSize?' active':'');
+    b.textContent=s.label;
+    b.onclick=()=>{activeSize=s.key;render();};
+    el.appendChild(b);
+  });
+}
+
+function fmt(x){ return (Math.round(x*10)/10).toLocaleString('ja-JP'); }
+function yen(x){ return Math.round(x).toLocaleString('ja-JP'); }
+
+function render(){
+  renderTabs();
+  const size = SIZES.find(s=>s.key===activeSize);
+  const list = products
+    .map(p=>({p, b:bestForSize(p,activeSize)}))
+    .filter(x=>x.b)
+    .sort((a,b)=>a.b.per-b.b.per);
+
+  const res = document.getElementById('results');
+  if(list.length===0){
+    res.innerHTML = `<div class="card"><div class="muted">「${size.label}」で販売中の商品がありません。</div></div>`;
+    return;
+  }
+  const cheapest = list[0];
+  let html = `<div class="card">
+    <div class="sizeHead">
+      <h2>${size.label} の最安ランキング</h2>
+      <span class="best">👑 ${cheapest.p.name}（${fmt(cheapest.b.per)}円/枚）</span>
+    </div>`;
+  list.forEach((x,i)=>{
+    const b=x.b, p=x.p;
+    html += `<div class="row${i===0?' top':''}">
+      <div class="rank">${i+1}</div>
+      <div class="info">
+        <div class="pname">${p.name}${p.campaign?('<span class="badge">'+(p.bonus10?'50%対象':'40%対象')+'</span>'):''}</div>
+        <div class="psub">${p.brand}・${b.sheets}枚（${b.n}個×${b.sheets/b.n}枚）</div>
+        <details class="bd">
+          <summary>内訳を見る ▾</summary>
+          <div class="bdgrid">
+            <span>推奨個数</span><b>${b.n}個</b>
+            <span>総額</span><b>${yen(b.total)}円</b>
+            <span>ウエル活pt</span><b>${yen(b.pt)}pt</b>
+            <span>楽天ペイ</span><b>${b.pay}円</b>
+            <span>40%還元</span><b>${p.campaign?('−'+yen(b.r40)+'pt'):'−'}</b>
+            ${p.bonus10?`<span>+10%還元</span><b>−${yen(b.r10)}pt</b>`:''}
+            ${b.r500?`<span>P&G500pt</span><b>−500pt</b>`:''}
+            <span>実質コスト</span><b>${yen(b.real)}円</b>
+          </div>
+        </details>
+      </div>
+      <div class="price">
+        <div class="per">${fmt(b.per)}<small>円/枚</small></div>
+        <div class="qty">${b.n}個で${yen(b.real)}円</div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  res.innerHTML = html;
+  document.getElementById('footNote').innerHTML =
+    `対象期間：${PERIOD}<br>`+
+    `組み合わせ込み最適化：各商品を主役に、複数個買い・40%(上限1000pt)・+10%(上限400pt)・P&G対象2,500円以上で+500ptを自動で一番安くなる買い方で計算<br>`+
+    `計算式：ウエル活pt=四捨五入((総額−1)÷1.5)、楽天ペイ=総額−pt×1.5、実質＝pt＋楽天ペイ−還元（1pt=1円）<br>`+
+    `※各枠(40%/+10%/P&G500pt)は月1回の通算枠。複数商品を同時に対象にすると枠は共有されるため、実際は「主役1商品＋おしりふき等」の1会計として『組み合わせ計算』タブでご確認を。`;
+}
+
+/* ================= 組み合わせ計算 ================= */
+const comboQty = {}; // index -> qty
+
+function comboCalc(){
+  let total=0, pampSub=0, bonusSub=0, pgSub=0, items=0;
+  products.forEach((p,i)=>{
+    const q = comboQty[i]||0;
+    if(!q) return;
+    const sub = q * tierPrice(p,q);
+    total += sub; items += q;
+    if(p.campaign) pampSub += sub;
+    if(p.bonus10)  bonusSub += sub;
+    if(p.brand==='P&G') pgSub += sub;
+  });
+  const hasCamp = pampSub>0;
+  const pt  = hasCamp ? Math.round((total-1)/WELKATSU) : Math.round(total/WELKATSU);
+  const pay = hasCamp ? Math.max(1, Math.round(total - pt*WELKATSU)) : 0;
+  const r40 = Math.min(Math.floor(pampSub*CAMP_RATE), CAMP_CAP);
+  const r10 = Math.min(Math.floor(bonusSub*BONUS_RATE), BONUS_CAP);
+  const r500 = pgSub>=PG_MIN ? PG_BACK : 0;
+  const reward = r40+r10+r500;
+  return {total,pampSub,bonusSub,pgSub,items,pt,pay,r40,r10,r500,reward,real:Math.round(pt+pay-reward),hasCamp};
+}
+
+function renderCombo(){
+  const list=document.getElementById('comboList');
+  let h='';
+  products.forEach((p,i)=>{
+    if(!p.available) return;
+    const q=comboQty[i]||0;
+    const tag = p.campaign ? `<span class="badge">${p.bonus10?'50%':'40%'}</span>` : '';
+    h+=`<div class="citem${q>0?' on':''}">
+      <div class="ci-info">
+        <div class="ci-name">${p.name}${tag}</div>
+        <div class="ci-sub">${p.brand}・${yen(p.p1)}円${p.noSize?'':' / 1パック'}</div>
+      </div>
+      <div class="stepper">
+        <button data-i="${i}" data-d="-1">−</button>
+        <div class="q" id="q${i}">${q}</div>
+        <button data-i="${i}" data-d="1">＋</button>
+      </div>
+    </div>`;
+  });
+  list.innerHTML=h;
+  list.querySelectorAll('.stepper button').forEach(b=>{
+    b.onclick=()=>{
+      const i=+b.dataset.i, d=+b.dataset.d;
+      comboQty[i]=Math.max(0,(comboQty[i]||0)+d);
+      document.getElementById('q'+i).textContent=comboQty[i];
+      b.closest('.citem').classList.toggle('on', comboQty[i]>0);
+      renderBar();
+    };
+  });
+  renderBar();
+}
+
+function renderBar(){
+  const bar=document.getElementById('comboBar');
+  const c=comboCalc();
+  if(c.items===0){
+    bar.innerHTML=`<div class="cwrap"><div class="muted">＋で商品を選んでください</div></div>`;
+    return;
+  }
+  bar.innerHTML=`<div class="cwrap">
+    <div class="ctop">
+      <div class="cjishitsu">実質 ${yen(c.real)}<small>円（${c.items}点）</small></div>
+      <div class="muted">総額 ${yen(c.total)}円</div>
+    </div>
+    <div class="cdetail">
+      支払い：ウエル活 <b>${yen(c.pt)}pt</b>${c.hasCamp?` ＋ 楽天ペイ <b>${c.pay}円</b>`:''}<br>
+      戻り：40%<b>−${yen(c.r40)}</b>${c.r10?` ／ +10%<b>−${yen(c.r10)}</b>`:''}${c.r500?` ／ P&amp;G500<b>−500</b>`:''} pt
+      ${c.pgSub>0 && c.pgSub<PG_MIN?`<br><span style="color:#c23b5b">※P&amp;Gあと${yen(PG_MIN-c.pgSub)}円で+500pt</span>`:''}
+      ${c.r40>=CAMP_CAP?`<br><span style="color:#c23b5b">※40%が上限1000ptに到達</span>`:''}
+    </div>
+  </div>`;
+}
+
+/* ================= モード切替 ================= */
+document.getElementById('mRank').onclick=()=>switchMode('rank');
+document.getElementById('mCombo').onclick=()=>switchMode('combo');
+function switchMode(m){
+  const rank=m==='rank';
+  document.getElementById('mRank').classList.toggle('active',rank);
+  document.getElementById('mCombo').classList.toggle('active',!rank);
+  document.getElementById('rankView').classList.toggle('hide',!rank);
+  document.getElementById('comboView').classList.toggle('hide',rank);
+  document.getElementById('comboBar').classList.toggle('hide',rank);
+  document.body.style.paddingBottom = rank ? '60px' : '150px';
+  if(!rank) renderCombo();
+}
+
+render();
+</script>
+</body>
+</html>
