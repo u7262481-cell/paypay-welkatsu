@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ウエル活 まるごとシミュレーター 2026年8月｜花王まとめ買い20%還元ほか</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6F1;--card:#FFFFFF;--rose:#C98B8B;--rose-soft:#EBC9C6;--rose-bg:#F7E7E4;
+  --sage:#9DB29A;--sage-bg:#E8EEE6;--gold:#C7A063;--ink:#5A4A45;--ink-soft:#8C7B74;--line:#EDE2DB;
+  --pp:#E60012;--pp-bg:#FDEAEA;--waon:#0F8FD6;--waon-bg:#E6F3FB;--natsu:#3E86B0;--natsu-bg:#E6F3FB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Zen Maru Gothic',sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,#FBF6F1 0%,#F6ECE6 100%);background-attachment:fixed;line-height:1.7;padding-bottom:340px}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header{text-align:center;padding:38px 16px 20px}
+.eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--gold);font-weight:700}
+h1{font-family:'Shippori Mincho',serif;font-size:1.5rem;color:var(--rose);margin:6px 0 4px;letter-spacing:.03em;line-height:1.45}
+.subtitle{color:var(--ink-soft);font-size:.9rem}
+.rule-card{background:var(--card);border-radius:22px;padding:18px 20px;margin:16px 0;box-shadow:0 8px 24px rgba(201,139,139,.10);border:1px solid var(--line)}
+.rule-card h2{font-family:'Shippori Mincho',serif;font-size:1.02rem;color:var(--rose);margin-bottom:8px}
+.rule-card ul{list-style:none;font-size:.85rem;color:var(--ink)}
+.rule-card li{padding:3px 0 3px 18px;position:relative}
+.rule-card li::before{content:"♦";color:var(--gold);position:absolute;left:0;font-size:.7rem;top:6px}
+.rule-card b{color:var(--rose)}
+.rule-card h2.n{color:var(--natsu)} .rule-card .nb b{color:var(--natsu)}
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.rule-pill{background:var(--natsu-bg);border-radius:14px;padding:10px 12px;text-align:center;font-size:.85rem;color:var(--ink)}
+.rule-pill b{color:var(--natsu)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:.85rem;background:var(--sage-bg);padding:10px 14px;border-radius:12px}
+.toggle-row label{cursor:pointer;user-select:none}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:20px;
+  padding:6px 16px;font-family:'Zen Maru Gothic';font-size:.84rem;cursor:pointer;transition:.12s}
+.chip.on{background:var(--rose);border-color:var(--rose);color:#fff;font-weight:700}
+.cat{font-family:'Shippori Mincho',serif;font-size:1.05rem;color:var(--sage);margin:24px 0 12px;display:flex;align-items:center;gap:10px}
+.cat::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sage)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(201,139,139,.07);display:flex;flex-direction:column;gap:8px;transition:.15s}
+.card.active{box-shadow:0 8px 22px rgba(201,139,139,.22);transform:translateY(-2px);border-color:var(--rose-soft)}
+.card .name{font-weight:700;font-size:.92rem;line-height:1.4}
+.card .maker{font-size:.72rem;color:var(--ink-soft);margin-top:-4px}
+.card .price{font-family:'Shippori Mincho',serif;font-size:1.3rem;color:var(--rose);display:flex;align-items:baseline;gap:2px}
+.card .price small{font-size:.7rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.price-in{font-family:'Shippori Mincho',serif;font-size:1.3rem;color:var(--rose);background:none;border:none;border-bottom:1.5px dashed var(--rose-soft);
+  width:5.2em;padding:0 2px;outline:none;-moz-appearance:textfield}
+.price-in::-webkit-outer-spin-button,.price-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.price-in::placeholder{color:#DCC7C0}
+.price-in:focus{border-bottom-color:var(--rose)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:.68rem;border-radius:8px;padding:2px 8px;line-height:1.6}
+.tag.pp{color:var(--rose);background:var(--rose-bg)}
+.tag.re{color:var(--sage);background:var(--sage-bg)}
+.tag.bn{color:#B08A3E;background:#FBF2DF}
+.tag.nt{color:var(--natsu);background:var(--natsu-bg)}
+.card .note{font-size:.68rem;color:#B5726F;background:#FBEFEC;border-radius:8px;padding:3px 8px;line-height:1.5}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
+.stepper .qty{font-family:'Shippori Mincho',serif;font-size:1.15rem;min-width:34px;text-align:center}
+.btn{width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;font-size:1.25rem;background:var(--rose-bg);color:var(--rose);font-weight:700;transition:.12s;display:flex;align-items:center;justify-content:center}
+.btn:hover{background:var(--rose);color:#fff}.btn:active{transform:scale(.9)}
+.btn.minus{background:#F1EAE6;color:var(--ink-soft)}.btn.minus:hover{background:var(--ink-soft);color:#fff}
+.add-lead{font-size:.82rem;color:var(--ink-soft);margin-bottom:12px}
+.add-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inp{font-family:'Zen Maru Gothic';font-size:.9rem;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;background:#FCF8F5;color:var(--ink);outline:none}
+.inp:focus{border-color:var(--rose-soft)}.inp::placeholder{color:#C9B8B0}
+#cName{flex:1;min-width:130px}.price-inp{width:120px}.qty-inp{width:64px;text-align:center}
+.natsu-check{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--natsu);background:var(--natsu-bg);border-radius:12px;padding:8px 12px;cursor:pointer}
+.add-btn{border:none;background:var(--rose);color:#fff;font-family:'Zen Maru Gothic';font-weight:700;border-radius:14px;padding:10px 18px;cursor:pointer;font-size:.9rem;transition:.12s}
+.add-btn:hover{background:#b87a7a}.add-btn:active{transform:scale(.96)}
+.custom-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.custom-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--rose-bg);border-radius:12px;padding:9px 14px;font-size:.86rem}
+.custom-item .ci-sum{font-family:'Shippori Mincho',serif;color:var(--rose)}
+.ci-del{border:none;background:none;color:var(--ink-soft);font-size:1.1rem;cursor:pointer;padding:0 4px}.ci-del:hover{color:var(--rose)}
+.reset{display:block;margin:18px auto 0;background:none;border:1px solid var(--rose-soft);color:var(--rose);border-radius:20px;padding:8px 22px;font-family:'Zen Maru Gothic';font-size:.85rem;cursor:pointer}
+.reset:hover{background:var(--rose-bg)}
+footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16px 0}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(201,139,139,.14);padding:12px 16px 14px;z-index:20;max-height:62vh;overflow-y:auto}
+.bar-in{max-width:900px;margin:0 auto}
+.bar-total{text-align:center;margin-bottom:8px}
+.bar-total .t{font-family:'Shippori Mincho',serif;font-size:1.5rem;color:var(--rose)}
+.bar-total .t small{font-size:.78rem;color:var(--ink-soft);font-family:'Zen Maru Gothic'}
+.bar-total .cnt{font-size:.78rem;color:var(--ink-soft);margin-left:8px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.split .box{border-radius:14px;padding:10px 12px;text-align:center}
+.split .pp{background:var(--pp-bg)}.split .wa{background:var(--waon-bg)}
+.split .lbl{font-size:.72rem;font-weight:700}
+.split .pp .lbl{color:var(--pp)}.split .wa .lbl{color:var(--waon)}
+.split .val{font-family:'Shippori Mincho',serif;font-size:1.45rem;margin-top:2px}
+.split .pp .val{color:var(--pp)}.split .wa .val{color:var(--waon)}
+.split .val small{font-size:.7rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+.backs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.back{background:#FAF5F1;border-radius:12px;padding:7px 6px;text-align:center;font-size:.7rem;color:var(--ink-soft)}
+.back b{display:block;font-family:'Shippori Mincho',serif;font-size:1.05rem;color:var(--gold);margin-top:1px}
+.back.n b{color:var(--natsu)}.back.r b{color:var(--sage)}
+.progress{height:8px;background:#F0E6E0;border-radius:6px;overflow:hidden;margin:6px 0}
+.progress .fill{height:100%;width:0;background:linear-gradient(90deg,var(--natsu),#7FB6D6);transition:.3s}
+.status{font-size:.86rem;text-align:center;min-height:1.4em;color:var(--ink)}
+.status .hl{font-family:'Shippori Mincho',serif;color:var(--rose);font-size:1.05rem}
+.status.win{color:var(--sage)}.status.win .hl{color:var(--sage)}
+.cond{text-align:center;font-size:.8rem;color:var(--natsu);font-weight:700;min-height:1.2em}
+.jisshitsu{margin-top:6px;text-align:center;font-family:'Shippori Mincho',serif;font-size:1.25rem;color:var(--rose);min-height:1em}
+.jisshitsu.kuroji{color:var(--sage)}
+.jisshitsu small{font-size:.72rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+.serif{margin-top:8px;background:var(--sage-bg);border:1px dashed var(--sage);border-radius:14px;padding:9px 14px;text-align:center;font-size:.88rem;color:var(--ink);display:none}
+.serif.show{display:block}
+.serif .q{font-family:'Shippori Mincho',serif;color:var(--sage);font-weight:700}
+.serif .lead{font-size:.72rem;color:var(--ink-soft);display:block;margin-bottom:3px}
+.serif .hlp{color:var(--waon);font-weight:700}.serif .hpp{color:var(--pp);font-weight:700}
+@media(max-width:560px){.grid{grid-template-columns:1fr}h1{font-size:1.25rem}.rule-grid{grid-template-columns:1fr}
+  .backs{grid-template-columns:repeat(2,1fr)}}
+</style>
+<style>
+.rakuten{display:flex;align-items:center;justify-content:center;gap:10px;background:#FBE9E9;border-radius:14px;padding:8px 12px;margin-bottom:8px;flex-wrap:wrap}
+.rakuten .rk-lbl{font-size:.72rem;font-weight:700;color:#BF0000}
+.rakuten .rk-val{font-family:'Shippori Mincho',serif;font-size:1.25rem;color:#BF0000}
+.rakuten .rk-val small{font-size:.7rem;font-family:'Zen Maru Gothic';color:var(--ink-soft)}
+.rakuten .rk-note{font-size:.7rem;color:var(--ink-soft)}
+.rakuten.off{display:none}
+.rule-card h2.k{color:#4C8C4A}.rule-card .kb b{color:#4C8C4A}
+.rule-pill.k{background:#E7F1E6}.rule-pill.k b{color:#4C8C4A}
+.tag.dm{color:#B24A7A;background:#FBE9F1}
+.tag.ka{color:#4C8C4A;background:#E7F1E6}
+.tag.pg{color:#1E6FA8;background:#E4F0F9}
+.tag.jn{color:#C07A2B;background:#FBF0E0}
+.back.k b{color:#4C8C4A}.back.d b{color:#B24A7A}.back.g b{color:#1E6FA8}
+.backs{grid-template-columns:repeat(4,1fr)}
+.backs.two{margin-top:-4px}
+.progress .fill{background:linear-gradient(90deg,#4C8C4A,#8FBF8D)}
+.cond{color:#4C8C4A}
+@media(max-width:560px){.backs{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">WELCIA ウエル活 2026.08</div>
+    <h1>ウエル活 まるごとシミュレーター<br>花王まとめ買い20%還元 ほか</h1>
+    <p class="subtitle">えらぶだけで、PayPayでいくら・WAON POINTでいくら払えばいいか＆実質額まで自動計算♪</p>
+  </header>
+
+  <div class="rule-card">
+    <h2 class="k">🌿 花王 まとめ買い20%還元（メイン）</h2>
+    <div class="rule-grid">
+      <div class="rule-pill k">1会計 税込 <b>2,500〜4,999円</b><br>→ <b>500pt</b></div>
+      <div class="rule-pill k">1会計 税込 <b>5,000円</b> 以上<br>→ <b>1,000pt</b></div>
+    </div>
+    <ul class="kb">
+      <li>対象期間 <b>8/3〜9/6</b>（エントリー締切 9/7 23:59）／<b>エントリー必須</b></li>
+      <li>レジで<b>WAON POINTカード提示</b>／レシート提出は<b>なし</b></li>
+      <li>上限 <b>1,000P/各回・最大2,000P</b>（5,000円購入を2回まで）／10月上旬に自動付与</li>
+      <li>花王商品<b>全品</b>が対象（※キュレル・ソフィーナ・カネボウ化粧品を除く）／<b>割引後</b>の価格で判定</li>
+    </ul>
+    <div class="toggle-row">
+      <input type="checkbox" id="welka" checked onchange="recalc()">
+      <label for="welka">ウエル活デー（20日）＝WAON POINT 1.5倍で計算する</label>
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <h2>🎀 PayPayクーポン／ランドリンシリーズ還元祭</h2>
+    <ul>
+      <li>ランドリンは <b>8/1〜8/31</b>、1会計 税込<b>2,000円以上</b>をPayPayで支払うと<b>20%還元</b>（上限1,000pt）</li>
+      <li>PayPayポイントは<b>PayPay決済額の66.5%が上限</b>。満額もらうには「還元額÷0.665」以上をPayPayで払い、残りをWAON POINTに</li>
+      <li><b>1円だけPayPay</b>はNG。クーポンは<b>支払い前に獲得</b>しておくこと</li>
+    </ul>
+  </div>
+
+  <div class="rule-card">
+    <h2>👶 P&amp;G・ジョンソン（レシート応募系）</h2>
+    <ul>
+      <li><b>パンパース40%還元</b>：7/16〜8/31。<b>レジで1円楽天ペイ</b>（楽天ポイントカード提示 or 楽天ペイ払いが条件）。上限1,000P（2,500円購入まで）。おやすみパンツ・超吸収エアリー・おしりふきは<b>+10%</b>（400Pまで＝4,000円購入まで）</li>
+      <li><b>P&amp;G 500pt還元</b>：対象ブランドを1会計<b>2,500円以上</b>で500pt。レシート提出必須・期間中1回・<b>割引前</b>価格で判定（7/1〜8/31、応募締切9/14）</li>
+      <li><b>ジョンソン20%還元</b>：700円(税込)以上で金額に応じたえらべるPay（700円台140P〜1,200円以上240P）。レシート提出必須・1人3回まで最大720P・レシート合算不可（7/1〜8/31、締切9/11）</li>
+    </ul>
+  </div>
+
+  <div class="rule-card">
+    <h2>🧾 レシチャレ・dマイレージ</h2>
+    <ul>
+      <li><b>レシチャレ</b>：商品ごとのコイン還元。レシート申請が必要。コイン数は増減するので<b>当日要確認</b></li>
+      <li><b>dマイレージ</b>：JANコードでエントリーして後日ポイント戻り。おむつ系が中心</li>
+      <li>どちらも花王・PayPayクーポンとの<b>併用OK</b>。つく商品は両方とも計算に入ります</li>
+    </ul>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div id="catalog"></div>
+
+  <div class="cat">自分で追加</div>
+  <div class="rule-card add-card">
+    <p class="add-lead">リストにない商品を追加できます♪（分かる範囲でどうぞ）</p>
+    <div class="add-form">
+      <input id="cName" class="inp" type="text" placeholder="商品名（任意）">
+      <input id="cPrice" class="inp price-inp" type="number" inputmode="decimal" step="0.01" placeholder="価格(税込)" min="0">
+      <input id="cRate" class="inp qty-inp" type="number" inputmode="numeric" placeholder="PayPay%" min="0">
+      <input id="cReci" class="inp price-inp" type="number" inputmode="numeric" placeholder="レシチャレP(任意)" min="0">
+      <input id="cQty" class="inp qty-inp" type="number" inputmode="numeric" value="1" min="1">
+      <label class="natsu-check" style="color:#4C8C4A;background:#E7F1E6"><input type="checkbox" id="cKao">花王対象</label>
+      <button class="add-btn" onclick="addCustom()">＋ 追加</button>
+    </div>
+    <div id="customList" class="custom-list"></div>
+  </div>
+
+  <button class="reset" onclick="resetAll()">えらんだ商品をリセット</button>
+  <footer>
+    価格は税込・SNS等の情報をもとにした参考値です。実際の価格・対象商品は店舗により異なります。<br>
+    レシチャレ・WAONボーナスP・dマイレージは<b>確認できた商品のみ</b>表示・計算しています（未表示＝未確認）。<br>
+    レシチャレのコイン数は日によって変わります。ウエル活当日に必ずご確認ください。<br>
+    PayPay／WAON POINTの内訳は目安で、端数や店舗により実際と異なる場合があります。<br>
+    最新の条件は各キャンペーン公式ページ・PayPayアプリ・店頭でご確認ください。<br>
+    うーまま ウエル活 まるごとシミュレーター（2026年8月版）
+  </footer>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="bar-total"><span class="t"><span id="total">0</span><small> 円(税込)</small></span><span class="cnt">／ <b id="count">0</b>点</span></div>
+    <div class="split">
+      <div class="box pp"><div class="lbl">PayPayで支払う</div><div class="val"><span id="pp">0</span><small> 円</small></div></div>
+      <div class="box wa"><div class="lbl">WAON POINTで支払う</div><div class="val"><span id="wa">0</span><small> P</small></div></div>
+    </div>
+    <div class="rakuten" id="rakutenBox"><span class="rk-lbl">楽天ペイで支払う</span><span class="rk-val"><span id="rk">0</span><small> 円</small></span><span class="rk-note" id="rkNote"></span></div>
+    <div class="backs">
+      <div class="back k">花王まとめ買い<b id="bKao">0</b></div>
+      <div class="back">ランドリン還元祭<b id="bPp">0</b></div>
+      <div class="back r">レシチャレ<b id="bReci">0</b></div>
+      <div class="back">WAONボーナス<b id="bBonus">0</b></div>
+    </div>
+    <div class="backs two">
+      <div class="back g">パンパース還元<b id="bPg40">0</b></div>
+      <div class="back g">P&amp;G 500pt<b id="bPg500">0</b></div>
+      <div class="back">ジョンソン<b id="bJohn">0</b></div>
+      <div class="back d">dマイレージ<b id="bDm">0</b></div>
+    </div>
+    <div class="progress"><div class="fill" id="fill"></div></div>
+    <div class="cond" id="cond"></div>
+    <div class="status" id="status">対象商品を選んでね♪</div>
+    <div class="jisshitsu" id="jisshitsu"></div>
+    <div class="serif" id="serif"></div>
+  </div>
+</div>
+<script>
+/* kao=花王まとめ買い対象 / rate=PayPayクーポン還元率 / reci=レシチャレ戻りP
+   bonus=WAONボーナスP / dm=dマイレージ戻りP / pg40=パンパース40%対象 / pg40plus=+10%対象
+   pg500=P&G500pt対象ブランド / john=ジョンソン20%対象 / cp=その他CP定額戻り */
+const PRODUCTS = [
+  // ── 花王（まとめ買い20%還元 対象） ──
+  {cat:"花王（まとめ買い20%還元）", name:"アタックZERO パーフェクトスティック", maker:"花王", kao:true},
+  {cat:"花王（まとめ買い20%還元）", name:"アタックZERO 本体／詰替", maker:"花王", kao:true},
+  {cat:"花王（まとめ買い20%還元）", name:"IROKA 本体／詰替", maker:"花王", kao:true, note:"レシチャレのIROKAはまとめ買いNG（レシートを分ける）"},
+  {cat:"花王（まとめ買い20%還元）", name:"メリーズ さらさらエアスルー", maker:"花王", kao:true, note:"花王20%還元＋ウエルシアアプリ10%OFFで約57%オフ。dマイレージ・ボーナスPは対象外"},
+  {cat:"花王（まとめ買い20%還元）", name:"ビオレ／めぐりズム／ヘルシア 各種", maker:"花王", kao:true},
+  {cat:"花王（まとめ買い20%還元）", name:"花王 対象商品（金額だけ入力用）", maker:"花王", kao:true, note:"キュレル・ソフィーナ・カネボウ化粧品は対象外"},
+
+  // ── 洗濯・柔軟剤（PayPayクーポン） ──
+  {cat:"洗濯・柔軟剤", name:"ランドリン 柔軟剤 詰替", maker:"ネイチャーラボ", rate:0.20, price:1738, landrin:true},
+  {cat:"洗濯・柔軟剤", name:"ランドリン 柔軟剤 ボトル", maker:"ネイチャーラボ", rate:0.20, price:877, landrin:true},
+  {cat:"洗濯・柔軟剤", name:"ランドリン ファブリックミスト", maker:"ネイチャーラボ", rate:0.20, price:657, landrin:true},
+
+  // ── ヘアケア・ボディ（レシチャレ） ──
+  {cat:"ヘアケア・ボディ", name:"ダイアン パーフェクトビューティー ドライシャンプー 40g", maker:"ネイチャーラボ", price:767, reci:530, note:"コイン数は8/11時点。当日変動あり"},
+  {cat:"ヘアケア・ボディ", name:"ダイアン ドライシャンプー 95g", maker:"ネイチャーラボ", price:1320, reci:720, bonus:100, note:"コイン数は8/11時点。当日変動あり"},
+  {cat:"ヘアケア・ボディ", name:"ダイアン ドライシャンプー 150g", maker:"ネイチャーラボ", price:1760, reci:960, note:"コイン数は8/11時点。当日変動あり"},
+
+  // ── ベビー・おむつ ──
+  {cat:"ベビー・おむつ", name:"パンパース 超吸収エアリー", maker:"P&G", price:1958, pg40:true, pg40plus:true, pg500:true, bonus:200, note:"先月パンパースを買っていない人向けの計算"},
+  {cat:"ベビー・おむつ", name:"パンパース おやすみパンツ 小", maker:"P&G", price:1848, pg40:true, pg40plus:true, pg500:true, note:"+10%還元対象シリーズ"},
+  {cat:"ベビー・おむつ", name:"パンパース おやすみパンツ 大", maker:"P&G", price:2838, pg40:true, pg40plus:true, pg500:true, note:"+10%還元対象。2500円超なので40%分は1000Pで頭打ち（+10%分は4,000円購入まで）"},
+  {cat:"ベビー・おむつ", name:"パンパース さらさらケア", maker:"P&G", pg40:true, pg500:true, note:"+10%は対象外（40%のみ）"},
+  {cat:"ベビー・おむつ", name:"パンパース おしりふき", maker:"P&G", pg40:true, pg40plus:true, pg500:true},
+  {cat:"ベビー・おむつ", name:"グーン ぐんぐん吸収パンツ", maker:"エリエール（大王製紙）", price:1427, bonus:140, dm:100, dmMax:5, note:"dマイレージは5個まで。モレ0・ぐんぐん吸収パンツ以外は対象外"},
+
+  // ── P&Gブランド（500pt還元 対象） ──
+  {cat:"P&G（500pt還元）", name:"アリエール／ボールド／さらさ", maker:"P&G", pg500:true},
+  {cat:"P&G（500pt還元）", name:"レノア／JOY", maker:"P&G", pg500:true},
+  {cat:"P&G（500pt還元）", name:"PANTENE／h&s／ハーバルエッセンス", maker:"P&G", pg500:true},
+  {cat:"P&G（500pt還元）", name:"ファブリーズ", maker:"P&G", pg500:true},
+  {cat:"P&G（500pt還元）", name:"ウィスパー／ジレット／ヴィーナス", maker:"P&G", pg500:true},
+  {cat:"P&G（500pt還元）", name:"BRAUN／Oral-B", maker:"P&G", pg500:true},
+
+  // ── ジョンソン（20%還元） ──
+  {cat:"ジョンソン（20%還元）", name:"カビキラー", maker:"ジョンソン", john:true},
+  {cat:"ジョンソン（20%還元）", name:"スクラビングバブル", maker:"ジョンソン", john:true},
+  {cat:"ジョンソン（20%還元）", name:"パイプユニッシュ", maker:"ジョンソン", john:true},
+  {cat:"ジョンソン（20%還元）", name:"ジップロック", maker:"ジョンソン", john:true},
+  {cat:"ジョンソン（20%還元）", name:"ファミリーガード／グレード／マックスシステム", maker:"ジョンソン", john:true},
+
+  // ── 食品・飲料 ──
+  {cat:"食品・飲料", name:"AJINOMOTO オリーブオイル 200g", maker:"味の素", price:570, dm:114},
+  {cat:"食品・飲料", name:"inゼリー", maker:"森永製菓", price:181, note:"山分けCPは1口最大200pt・8/3〜9/30。抽選なので計算には入れていません"},
+  {cat:"食品・飲料", name:"サクレ", maker:"フタバ食品", price:116, note:"3個購入で3,000円分が1,000名に当たる懸賞。抽選なので計算には入れていません"},
+
+  // ── 医薬品・その他 ──
+  {cat:"医薬品・その他", name:"シンクロコーワ", maker:"興和", price:321, cp:150, note:"1人1回限り。バラ売り1本のみ対象"},
+];
+
+const qty   = PRODUCTS.map(()=>0);
+const price = PRODUCTS.map(p=>p.price||0);
+let customItems = [];
+let filter = 'all';
+
+const CAP=0.665;
+/* 花王 */
+const KAO_T1=2500, KAO_T2=5000, KAO_P1=500, KAO_P2=1000, KAO_MAX=2000;
+/* ランドリン(PayPay) */
+const LAN_MIN=2000, LAN_RATE=0.20, LAN_MAX=1000;
+/* パンパース40% */
+const PG40_MAX=1000, PG40P_MAX=400;
+/* P&G 500pt */
+const PG500_MIN=2500, PG500_P=500;
+/* ジョンソン */
+const JOHN_MAX=720;
+function johnPt(v){
+  if(v<700) return 0;
+  if(v<800) return 140;
+  if(v<900) return 160;
+  if(v<1000) return 180;
+  if(v<1100) return 200;
+  if(v<1200) return 220;
+  return 240;
+}
+
+function match(p){
+  if(filter==='kao')  return !!p.kao;
+  if(filter==='pp')   return !!p.landrin;
+  if(filter==='reci') return !!p.reci;
+  if(filter==='pg')   return !!(p.pg40||p.pg500);
+  if(filter==='dm')   return !!p.dm;
+  return true;
+}
+function renderFilters(){
+  const f=[['all','すべて'],['kao','花王まとめ買い'],['pp','ランドリン還元祭'],['reci','レシチャレ'],['pg','P&G'],['dm','dマイレージ']];
+  document.getElementById('filters').innerHTML=f.map(([k,l])=>
+    `<button class="chip${filter===k?' on':''}" onclick="setFilter('${k}')">${l}</button>`).join('');
+}
+function setFilter(k){filter=k;renderFilters();render()}
+
+function render(){
+  const root=document.getElementById('catalog'); root.innerHTML='';
+  const cats=[...new Set(PRODUCTS.filter(match).map(p=>p.cat))];
+  cats.forEach(cat=>{
+    const h=document.createElement('div'); h.className='cat'; h.textContent=cat; root.appendChild(h);
+    const g=document.createElement('div'); g.className='grid';
+    PRODUCTS.forEach((p,i)=>{
+      if(p.cat!==cat||!match(p))return;
+      const card=document.createElement('div'); card.className='card'+(qty[i]>0?' active':'');
+      card.innerHTML=`<div class="name">${p.name}</div>
+        <div class="maker">${p.maker}</div>
+        <div class="price"><input class="price-in" type="number" inputmode="decimal" min="0" step="0.01"
+          placeholder="ー" value="${price[i]||''}" oninput="setPrice(${i},this.value)"><small> 円(税込)</small></div>
+        <div class="tags" id="tags${i}">${tagsHtml(p,i)}</div>
+        ${p.note?`<div class="note">⚠ ${p.note}</div>`:''}
+        <div class="stepper">
+          <button class="btn minus" onclick="dec(${i})">−</button>
+          <span class="qty">${qty[i]}</span>
+          <button class="btn" onclick="inc(${i})">＋</button>
+        </div>`;
+      g.appendChild(card);
+    });
+    root.appendChild(g);
+  });
+}
+function tagsHtml(p,i){
+  let t='';
+  if(p.kao)  t+=`<span class="tag ka">花王まとめ買い 対象</span>`;
+  if(p.landrin) t+=`<span class="tag pp">ランドリン還元祭 対象</span>`;
+  else if(p.rate>0) t+=`<span class="tag pp">PayPay${Math.round(p.rate*100)}%</span>`;
+  if(p.pg40)   t+=`<span class="tag pg">パンパース40%${p.pg40plus?'+10%':''}</span>`;
+  if(p.pg500)  t+=`<span class="tag pg">P&G 500pt 対象</span>`;
+  if(p.john)   t+=`<span class="tag jn">ジョンソン20%</span>`;
+  if(p.reci)   t+=`<span class="tag re">レシチャレ +${p.reci.toLocaleString()}</span>`;
+  if(p.bonus)  t+=`<span class="tag bn">WAONボーナス +${p.bonus.toLocaleString()}P</span>`;
+  if(p.dm)     t+=`<span class="tag dm">dマイレージ +${p.dm.toLocaleString()}P${p.dmMax?`（${p.dmMax}個まで）`:''}</span>`;
+  if(p.cp)     t+=`<span class="tag bn">キャンペーン +${p.cp.toLocaleString()}P</span>`;
+  return t;
+}
+function setPrice(i,v){
+  price[i]=parseFloat(v)||0;
+  const el=document.getElementById('tags'+i);
+  if(el) el.innerHTML=tagsHtml(PRODUCTS[i],i);
+  recalc();
+}
+function inc(i){qty[i]++;render();recalc()}
+function dec(i){if(qty[i]>0)qty[i]--;render();recalc()}
+function resetAll(){qty.fill(0);PRODUCTS.forEach((p,i)=>price[i]=p.price||0);customItems=[];render();renderCustom();recalc()}
+
+function addCustom(){
+  const n=document.getElementById('cName'),p=document.getElementById('cPrice'),r=document.getElementById('cRate'),
+        rc=document.getElementById('cReci'),q=document.getElementById('cQty'),ka=document.getElementById('cKao');
+  const pr=parseFloat(p.value);let qq=parseInt(q.value,10);
+  const rt=(parseFloat(r.value)||0)/100, rci=parseInt(rc.value,10)||0;
+  if(!pr||pr<=0){p.focus();p.style.borderColor='#C9736B';return;}
+  if(!qq||qq<1)qq=1;
+  customItems.push({name:n.value.trim()||'追加商品',price:pr,qty:qq,rate:rt,reci:rci,kao:ka.checked});
+  n.value='';p.value='';r.value='';rc.value='';q.value='1';ka.checked=false;p.style.borderColor='';
+  renderCustom();recalc();
+}
+function removeCustom(i){customItems.splice(i,1);renderCustom();recalc()}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderCustom(){
+  document.getElementById('customList').innerHTML=customItems.map((c,i)=>`
+    <div class="custom-item"><span>${escapeHtml(c.name)} <small style="color:var(--ink-soft)">¥${c.price.toLocaleString()}×${c.qty}${c.rate?`・${Math.round(c.rate*100)}%`:''}${c.reci?`・レシチャレ${c.reci}`:''}${c.kao?'・花王対象':''}</small></span>
+    <span class="ci-sum">¥${Math.round(c.price*c.qty).toLocaleString()}</span>
+    <button class="ci-del" onclick="removeCustom(${i})">×</button></div>`).join('');
+}
+
+function recalc(){
+  let T=0,count=0,ppOther=0,reciTotal=0,bonusTotal=0,dmTotal=0,cpTotal=0;
+  let kaoSub=0,lanSub=0,pg40Sub=0,pg40pSub=0,pg500Sub=0,johnSub=0;
+  PRODUCTS.forEach((p,i)=>{
+    if(qty[i]<=0)return;
+    const sub=(price[i]||0)*qty[i];
+    T+=sub;count+=qty[i];
+    if(p.rate>0 && !p.landrin) ppOther+=Math.floor(sub*p.rate);
+    reciTotal+=(p.reci||0)*qty[i];
+    bonusTotal+=(p.bonus||0)*qty[i];
+    dmTotal+=(p.dm||0)*Math.min(qty[i], p.dmMax||Infinity);
+    cpTotal+=(p.cp||0)*qty[i];
+    if(p.kao)   kaoSub+=sub;
+    if(p.landrin) lanSub+=sub;
+    if(p.pg40)  pg40Sub+=sub;
+    if(p.pg40plus) pg40pSub+=sub;
+    if(p.pg500) pg500Sub+=sub;
+    if(p.john)  johnSub+=sub;
+  });
+  customItems.forEach(c=>{
+    const sub=c.price*c.qty;T+=sub;count+=c.qty;
+    ppOther+=Math.floor(sub*(c.rate||0));reciTotal+=(c.reci||0)*c.qty;
+    if(c.kao)kaoSub+=sub;
+  });
+  T=Math.round(T);kaoSub=Math.round(kaoSub);lanSub=Math.round(lanSub);
+
+  // 花王まとめ買い（段階・上限2000P＝5000円×2回）
+  let kaoP=0;
+  if(kaoSub>=KAO_T2){ kaoP=Math.min(KAO_MAX, Math.floor(kaoSub/KAO_T2)*KAO_P2); if(kaoP===0)kaoP=KAO_P2; }
+  else if(kaoSub>=KAO_T1){ kaoP=KAO_P1; }
+
+  // ランドリン還元祭：対象商品の合計が2,000円以上になったら、その合計の20%
+  let ppP = (lanSub>=LAN_MIN) ? Math.floor(lanSub*LAN_RATE) : 0;
+  ppP += ppOther;                       // 自分で追加した商品などの個別還元
+  ppP = Math.min(ppP, LAN_MAX);
+
+  // パンパース40%＋10%：それぞれ小数点以下は切り捨て
+  const r40 = Math.min(Math.floor(pg40Sub *0.40), PG40_MAX);   // 上限1000P（2,500円購入まで）
+  const r10 = Math.min(Math.floor(pg40pSub*0.10), PG40P_MAX);  // 上限400P（4,000円購入まで）
+  const pg40P = r40 + r10;
+  // P&G 500pt
+  const pg500P = pg500Sub>=PG500_MIN ? PG500_P : 0;
+  // ジョンソン
+  const johnP = Math.min(johnPt(johnSub), JOHN_MAX);
+
+  const waonMult=document.getElementById('welka').checked?1.5:1;
+  document.getElementById('total').textContent=T.toLocaleString();
+  document.getElementById('count').textContent=count;
+  const st=document.getElementById('status'),ppEl=document.getElementById('pp'),waEl=document.getElementById('wa');
+  const sf=document.getElementById('serif'),ji=document.getElementById('jisshitsu'),cd=document.getElementById('cond'),fl=document.getElementById('fill');
+
+  document.getElementById('bKao').textContent=kaoP.toLocaleString()+'pt';
+  document.getElementById('bPp').textContent=ppP.toLocaleString()+'P';
+  document.getElementById('bReci').textContent=reciTotal.toLocaleString();
+  document.getElementById('bBonus').textContent=bonusTotal.toLocaleString()+'P';
+  document.getElementById('bPg40').textContent=pg40P.toLocaleString()+'P';
+  document.getElementById('bPg500').textContent=pg500P.toLocaleString()+'pt';
+  document.getElementById('bJohn').textContent=johnP.toLocaleString()+'P';
+  document.getElementById('bDm').textContent=dmTotal.toLocaleString()+'P';
+
+  // 花王の進捗
+  fl.style.width = Math.min(100, kaoSub/KAO_T2*100) + '%';
+  if(kaoSub<=0){ cd.textContent=''; fl.style.width='0'; }
+  else if(kaoSub<KAO_T1){ cd.textContent=`花王500ptまで あと${(KAO_T1-kaoSub).toLocaleString()}円`; }
+  else if(kaoSub<KAO_T2){ cd.textContent=`✓ 花王500pt獲得！ 1,000ptまで あと${(KAO_T2-kaoSub).toLocaleString()}円`; }
+  else { cd.textContent=`🎉 花王1,000pt 獲得ライン到達！（5,000円会計を2回まで＝最大2,000pt）`; }
+  if(lanSub>0 && lanSub<LAN_MIN){
+    cd.textContent += (cd.textContent?'／':'')+`ランドリンはあと${(LAN_MIN-lanSub).toLocaleString()}円で20%還元`;
+  }
+
+  if(count<=0){ppEl.textContent='0';waEl.textContent='0';st.className='status';st.textContent='対象商品を選んでね♪';ji.textContent='';ji.className='jisshitsu';sf.className='serif';return;}
+  if(T<=0){ppEl.textContent='—';waEl.textContent='—';st.className='status';st.textContent='えらんだ商品の税込価格を入力してね♪';ji.textContent='';ji.className='jisshitsu';sf.className='serif';return;}
+
+  const payPay=Math.min(T,Math.ceil(ppP/CAP));
+  const rest=T-payPay;
+
+  /* 楽天ペイ端数：パンパース還元は「1円楽天ペイ」が条件。
+     必要WAONポイントから1つ減らし、×1.5して四捨五入した額をポイントで支払う。
+     残り（合計 − その額）が楽天ペイ分＝必ず1円か2円になる */
+  const needRakuten = pg40Sub>0;
+  const needPt = Math.floor(Math.floor(rest)/waonMult + 0.5);
+  let rk=0, waonP;
+  if(needRakuten && rest>=3){
+    waonP = needPt - 1;
+    rk = rest - Math.floor(waonP * waonMult);
+  }else{
+    waonP = needPt;
+  }
+  const rkBox=document.getElementById('rakutenBox');
+  rkBox.className = needRakuten? 'rakuten' : 'rakuten off';
+  document.getElementById('rk').textContent=rk.toLocaleString();
+  document.getElementById('rkNote').textContent = needRakuten
+    ? `（必要${needPt.toLocaleString()}P−1＝${waonP.toLocaleString()}P ×${waonMult}＝${Math.floor(waonP*waonMult).toLocaleString()}円(切捨) → 残り${rk}円）`
+    : '';
+  ppEl.textContent=payPay.toLocaleString();
+  waEl.textContent=waonP.toLocaleString();
+  st.className='status win';
+  st.innerHTML=`✓ PayPay <span class="hl">${payPay.toLocaleString()}円</span> ＋ WAON POINT <span class="hl">${waonP.toLocaleString()}P</span>`
+    +(ppP>=LAN_MAX?' <small>（PayPay上限1,000P到達）</small>':'');
+
+  const backs = ppP + kaoP + reciTotal + bonusTotal + dmTotal + cpTotal + pg40P + pg500P + johnP;
+  const jisshitsu = payPay + rk + waonP - backs;
+  const off = T>0 ? Math.round((T-jisshitsu)/T*100) : 0;
+  if(jisshitsu<0){
+    ji.className='jisshitsu kuroji';
+    ji.innerHTML=`⇒ 実質 ${Math.abs(jisshitsu).toLocaleString()}円 黒字！🎉 <small>(${count}点)</small>`;
+  }else{
+    ji.className='jisshitsu';
+    ji.innerHTML=`⇒ 実質 ${jisshitsu.toLocaleString()}円 <small>(${count}点・${off}%オフ)</small>`;
+  }
+  sf.className='serif show';
+  const tail = needRakuten
+    ? `<span class="hpp">残り${rk}円を楽天ペイ</span>で支払います`
+    : `<span class="hpp">残りをPayPay</span>で支払います`;
+  sf.innerHTML=`<span class="lead">レジでこう唱えてね♪</span><span class="q">「<span class="hlp">WAON POINTを${waonP.toLocaleString()}P</span>で支払って、${tail}」</span>`;
+}
+renderFilters();render();renderCustom();recalc();
+</script>
+</body>
+</html>
