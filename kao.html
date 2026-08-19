@@ -180,11 +180,12 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
   </div>
 
   <div class="rule-card">
-    <h2>🧾 レシチャレ・dマイレージ</h2>
+    <h2>🧾 レシチャレ・dマイレージ・スタンプラリー</h2>
     <ul>
       <li><b>レシチャレ</b>：商品ごとのコイン還元。レシート申請が必要。コイン数は増減するので<b>当日要確認</b></li>
       <li><b>dマイレージ</b>：JANコードでエントリーして後日ポイント戻り。おむつ系が中心</li>
-      <li>どちらも花王・PayPayクーポンとの<b>併用OK</b>。つく商品は両方とも計算に入ります</li>
+      <li><b>WAON POINTスタンプラリー</b>：アタックZEROスティック／IROKAメイクアップフレグランスが対象。1個でスタンプ1個、<b>5個300pt・7個500pt・10個1,000pt</b>（上限1,000pt）</li>
+      <li>いずれも花王20%還元との<b>併用OK</b>。つく商品は全部まとめて計算に入ります</li>
     </ul>
   </div>
 
@@ -234,6 +235,7 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
       <div class="back g" data-k="bPg500">P&amp;G500pt<b id="bPg500">0</b></div>
       <div class="back" data-k="bJohn">ジョンソン<b id="bJohn">0</b></div>
       <div class="back d" data-k="bDm">dマイレージ<b id="bDm">0</b></div>
+      <div class="back k" data-k="bStamp">スタンプラリー<b id="bStamp">0</b></div>
     </div>
       <div class="back g">P&amp;G 500pt<b id="bPg500">0</b></div>
       <div class="back">ジョンソン<b id="bJohn">0</b></div>
@@ -252,11 +254,16 @@ footer{text-align:center;font-size:.72rem;color:var(--ink-soft);padding:24px 16p
    pg500=P&G500pt対象ブランド / john=ジョンソン20%対象 / cp=その他CP定額戻り */
 const PRODUCTS = [
   // ── 花王（まとめ買い20%還元 対象） ──
-  {cat:"花王（まとめ買い20%還元）", name:"アタックZERO パーフェクトスティック", maker:"花王", kao:true},
   {cat:"花王（まとめ買い20%還元）", name:"アタックZERO 本体／詰替", maker:"花王", kao:true},
   {cat:"花王（まとめ買い20%還元）", name:"IROKA 本体／詰替", maker:"花王", kao:true, note:"レシチャレのIROKAはまとめ買いNG（レシートを分ける）"},
-  {cat:"花王（まとめ買い20%還元）", name:"メリーズ さらさらエアスルー", maker:"花王", kao:true, note:"花王20%還元＋ウエルシアアプリ10%OFFで約57%オフ。dマイレージ・ボーナスPは対象外"},
+  {cat:"花王（まとめ買い20%還元）", name:"メリーズ さらさらエアスルー", maker:"花王", kao:true, note:"価格は店頭で確認して入力してください。dマイレージ・ボーナスPは対象外"},
   {cat:"花王（まとめ買い20%還元）", name:"ビオレ／めぐりズム／ヘルシア 各種", maker:"花王", kao:true},
+  {cat:"花王（まとめ買い20%還元）", name:"IROKA 本体", maker:"花王", price:932.8, kao:true, reci:130, note:"IROKAは種類によって本体913円/詰替1012円。まとめ買い対象外"},
+  {cat:"花王（まとめ買い20%還元）", name:"IROKA つめかえ用 650ml", maker:"花王", price:1075.8, kao:true, reci:110, note:"まとめ買い対象外（複数買いはレシートを分ける）"},
+  {cat:"花王（まとめ買い20%還元）", name:"IROKA 本体＋つめかえ用650ml セット", maker:"花王", price:2008.6, kao:true, reci:350, note:"セット購入のレシチャレ。まとめ買い対象外"},
+  {cat:"花王（まとめ買い20%還元）", name:"アタックZERO パーフェクトスティック 16本入", maker:"花王", price:547.8, kao:true, stamp:true, note:"437円の店舗もあり。WAON POINTスタンプラリー対象（1個=スタンプ1）"},
+  {cat:"花王（まとめ買い20%還元）", name:"IROKA メイクアップフレグランス 90ml", maker:"花王", price:844.8, kao:true, stamp:true, note:"WAON POINTスタンプラリー対象（1個=スタンプ1）"},
+
   {cat:"花王（まとめ買い20%還元）", name:"花王 対象商品（金額だけ入力用）", maker:"花王", kao:true, note:"キュレル・ソフィーナ・カネボウ化粧品は対象外"},
 
   // ── 洗濯・柔軟剤（PayPayクーポン） ──
@@ -270,7 +277,7 @@ const PRODUCTS = [
   {cat:"ヘアケア・ボディ", name:"ダイアン ドライシャンプー 150g", maker:"ネイチャーラボ", price:1760, reci:960, note:"8/19増量後のコイン数。似た商品で対象外JANあり"},
 
   {cat:"ヘアケア・ボディ", name:"ダイアン ボヌール ドライシャンプー", maker:"ネイチャーラボ", price:1518, reci:840, note:"8/19増量後のコイン数"},
-  {cat:"ヘアケア・ボディ", name:"ビオレ ザ ボディ ポンプ", maker:"花王", price:932, kao:true, reci:220, note:"まとめ買い対象外（複数買いはレシートを分ける）"},
+  {cat:"ヘアケア・ボディ", name:"ビオレ ザ ボディ ポンプ", maker:"花王", price:932.8, kao:true, reci:220, note:"まとめ買い対象外（複数買いはレシートを分ける）"},
   {cat:"ヘアケア・ボディ", name:"ビオレ ザ ボディ ポンプ＋つめかえセット", maker:"花王", price:1922, kao:true, reci:550, note:"セット購入のレシチャレ。まとめ買い対象外"},
   {cat:"スキンケア・日焼け止め", name:"ニベアUV ディープ プロテクト&ケア ミスト", maker:"ニベア花王", price:1078, kao:true, reci:100, note:"増量ではないが花王20%還元の対象"},
   {cat:"スキンケア・日焼け止め", name:"ニベアUV ジェル／エッセンス／トーンアップ", maker:"ニベア花王", price:968, kao:true, reci:100},
@@ -304,6 +311,7 @@ const PRODUCTS = [
   {cat:"食品・飲料", name:"inゼリー", maker:"森永製菓", price:181, note:"山分けCPは1口最大200pt・8/3〜9/30。抽選なので計算には入れていません"},
   {cat:"食品・飲料", name:"サクレ", maker:"フタバ食品", price:116, note:"3個購入で3,000円分が1,000名に当たる懸賞。抽選なので計算には入れていません"},
 
+
   // ── 医薬品・その他 ──
   {cat:"医薬品・その他", name:"シンクロコーワ", maker:"興和", price:321, cp:150, note:"1人1回限り。バラ売り1本のみ対象"},
 ];
@@ -324,6 +332,8 @@ const PG40_MAX=1000, PG40P_MAX=400;
 const PG500_MIN=2500, PG500_P=500;
 /* ジョンソン */
 const JOHN_MAX=720;
+/* WAON POINTスタンプラリー（アタックZERO／IROKAメイクアップフレグランス） */
+function stampPt(n){ if(n>=10) return 1000; if(n>=7) return 500; if(n>=5) return 300; return 0; }
 function johnPt(v){
   if(v<700) return 0;
   if(v<800) return 140;
@@ -382,6 +392,7 @@ function tagsHtml(p,i){
   if(p.pg40)   t+=`<span class="tag pg">パンパース40%${p.pg40plus?'+10%':''}</span>`;
   if(p.pg500)  t+=`<span class="tag pg">P&G 500pt 対象</span>`;
   if(p.john)   t+=`<span class="tag jn">ジョンソン20%</span>`;
+  if(p.stamp)  t+=`<span class="tag ka">スタンプラリー対象</span>`;
   if(p.reci)   t+=`<span class="tag re">レシチャレ +${p.reci.toLocaleString()}</span>`;
   if(p.bonus)  t+=`<span class="tag bn">WAONボーナス +${p.bonus.toLocaleString()}P</span>`;
   if(p.dm)     t+=`<span class="tag dm">dマイレージ +${p.dm.toLocaleString()}P${p.dmMax?`（${p.dmMax}個まで）`:''}</span>`;
@@ -420,7 +431,7 @@ function renderCustom(){
 
 function recalc(){
   let T=0,count=0,ppOther=0,reciTotal=0,bonusTotal=0,dmTotal=0,cpTotal=0;
-  let kaoSub=0,lanSub=0,pg40Sub=0,pg40pSub=0,pg500Sub=0,johnSub=0;
+  let kaoSub=0,lanSub=0,pg40Sub=0,pg40pSub=0,pg500Sub=0,johnSub=0,stampN=0;
   PRODUCTS.forEach((p,i)=>{
     if(qty[i]<=0)return;
     const sub=(price[i]||0)*qty[i];
@@ -436,6 +447,7 @@ function recalc(){
     if(p.pg40plus) pg40pSub+=sub;
     if(p.pg500) pg500Sub+=sub;
     if(p.john)  johnSub+=sub;
+    if(p.stamp) stampN+=qty[i];
   });
   customItems.forEach(c=>{
     const sub=c.price*c.qty;T+=sub;count+=c.qty;
@@ -462,6 +474,7 @@ function recalc(){
   const pg500P = pg500Sub>=PG500_MIN ? PG500_P : 0;
   // ジョンソン
   const johnP = Math.min(johnPt(johnSub), JOHN_MAX);
+  const stampP = stampPt(stampN);
 
   const waonMult=document.getElementById('welka').checked?1.5:1;
   document.getElementById('total').textContent=T.toLocaleString();
@@ -477,6 +490,7 @@ function recalc(){
   document.getElementById('bPg500').textContent=pg500P.toLocaleString()+'pt';
   document.getElementById('bJohn').textContent=johnP.toLocaleString()+'P';
   document.getElementById('bDm').textContent=dmTotal.toLocaleString()+'P';
+  document.getElementById('bStamp').textContent=stampP.toLocaleString()+'pt';
 
   // 値が0の還元タイルは隠す
   document.querySelectorAll('#backs .back').forEach(el=>{
@@ -490,6 +504,10 @@ function recalc(){
   else if(kaoSub<KAO_T1){ cd.textContent=`花王500ptまで あと${(KAO_T1-kaoSub).toLocaleString()}円`; }
   else if(kaoSub<KAO_T2){ cd.textContent=`✓ 花王500pt獲得！ 1,000ptまで あと${(KAO_T2-kaoSub).toLocaleString()}円`; }
   else { cd.textContent=`🎉 花王1,000pt 獲得ライン到達！（5,000円会計を2回まで＝最大2,000pt）`; }
+  if(stampN>0 && stampN<10){
+    const nx = stampN<5?5:(stampN<7?7:10), pt = nx===5?300:(nx===7?500:1000);
+    cd.textContent += (cd.textContent?'／':'')+`スタンプ${stampN}個。あと${nx-stampN}個で${pt}pt`;
+  }
   if(lanSub>0 && lanSub<LAN_MIN){
     cd.textContent += (cd.textContent?'／':'')+`ランドリンはあと${(LAN_MIN-lanSub).toLocaleString()}円で20%還元`;
   }
@@ -524,7 +542,7 @@ function recalc(){
   st.innerHTML=`✓ PayPay <span class="hl">${payPay.toLocaleString()}円</span> ＋ WAON POINT <span class="hl">${waonP.toLocaleString()}P</span>`
     +(ppP>=LAN_MAX?' <small>（PayPay上限1,000P到達）</small>':'');
 
-  const backs = ppP + kaoP + reciTotal + bonusTotal + dmTotal + cpTotal + pg40P + pg500P + johnP;
+  const backs = ppP + kaoP + reciTotal + bonusTotal + dmTotal + cpTotal + pg40P + pg500P + johnP + stampP;
   const jisshitsu = payPay + rk + waonP - backs;
   const off = T>0 ? Math.round((T-jisshitsu)/T*100) : 0;
   if(jisshitsu<0){
