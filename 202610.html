@@ -266,7 +266,7 @@ const PRODUCTS = [
   {cat:"ブラフラ対象（日用品）", name:"ネピア 激吸収キッチンタオル 4R100カット", maker:"王子ネピア", price:398, tax:10, bf:true, qtyDefault:3},
   {cat:"ブラフラ対象（日用品）", name:"NEWクレラップ 22cm×50m", maker:"クレハ", price:298, tax:10, bf:true, qtyDefault:3},
   {cat:"ブラフラ対象（日用品）", name:"ロリエ スリムガード レギュラーパック", maker:"花王", price:398, tax:10, bf:true, qtyDefault:3,
-   note:"ロリエ しあわせ素肌レギュラーも同価格。エリエールはブラフラ対象外"},
+   note:"ロリエ しあわせ素肌レギュラーも同価格。エリエールもブラフラ対象メーカー"},
   {cat:"ブラフラ対象（日用品）", name:"メリーズ 新生児用（60枚）", maker:"花王", price:1398, tax:10, bf:true, qtyDefault:3,
    note:"ブラフラ対象はメリーズのみ"},
   {cat:"ブラフラ対象（日用品）", name:"メリーズ パンツ L（54枚）", maker:"花王", price:1598, tax:10, bf:true, qtyDefault:3,
@@ -283,8 +283,27 @@ const PRODUCTS = [
    note:"投稿は208pt・実質36円(計算式では209pt・37円)"},
   {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"GUM プラスデンタルペースト", maker:"サンスター", price:398, tax:10, bf:true, qtyDefault:3, etcP:80, etcLabel:"レシチャレ", ppGroup:"sunstar",
    note:"レシチャレは1日5回まで・店舗指定あり・〜10/30"},
-  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"GUM プラスデンタルリンス", maker:"サンスター", price:880, tax:10, bf:true, qtyDefault:3, etcP:150, etcLabel:"レシチャレ", ppGroup:"sunstar",
-   note:"レシチャレは1日5回まで・店舗指定あり・〜10/30"},
+  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"GUM プラスデンタルリンス", maker:"サンスター", price:880, tax:10, bf:true, qtyDefault:3, etcP:250, etcLabel:"レシチャレ", ppGroup:"sunstar",
+   note:"レシチャレが150P→250Pに増額(10/18時点)。1日5回まで・店舗指定あり・〜10/30"},
+
+  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"モンダミン プレミアムケア 本体", maker:"アース製薬", price:898, tax:10, bf:true, qtyDefault:1, etcP:500, etcLabel:"レシチャレ350+ボーナス150",
+   note:"1本で実質39円の黒字。レシチャレはまとめ買いOK・1日5回まで・〜12/20"},
+  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"ケープ フォーアクティブ クロミ50g＋旧リーゼ ティントカラージェル（セット）", maker:"花王", price:1198, tax:10, bf:true, pcs:2, qtyDefault:1, etcP:680, etcLabel:"レシチャレ(セット)",
+   note:"1セットで実質65円の黒字。2点として数えます。まとめ買い不可（複数はレシート分け）・店舗指定あり・〜11/30"},
+  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"ダヴ パールシャイン チューブ洗顔＋クレンジングオイル（2点）", maker:"ユニリーバ", price:1928, tax:10, bf:true, pcs:2, qtyDefault:1, etcP:780, etcLabel:"レシチャレ(2点)",
+   note:"2点として数えます。レシチャレ増量(10/19〜10/21)時の値。まとめ買い対象外"},
+  {cat:"ブラフラ対象（美容・ヘルス・オーラル）", name:"エージーデオ24 プレミアム スプレー LL", maker:"ファイントゥデイ", price:1200, tax:10, bf:true, qtyDefault:1, etcP:300, etcLabel:"レシチャレ",
+   note:"レシチャレ増量(10/19〜10/21)時の値。まとめ買いOK"},
+
+  // ── レシチャレ（ブラフラ対象外メーカー） ──
+  {cat:"レシチャレ（ブラフラ対象外）", name:"ダイアン スカルプ&ボリューム 詰替 660mL", maker:"ネイチャーラボ", price:598, tax:10, qtyDefault:1, etcP:415, etcLabel:"レシチャレ",
+   note:"ブラフラ対象外メーカー。実質23円"},
+  {cat:"レシチャレ（ブラフラ対象外）", name:"ビゲン リピカラー", maker:"ホーユー", price:800, tax:10, qtyDefault:1, etcP:480, etcLabel:"レシチャレ280+ボーナス200",
+   note:"ブラフラ対象外メーカー。まとめ買いOK・1日5回まで・店舗指定あり"},
+  {cat:"レシチャレ（ブラフラ対象外）", name:"MARO デオスカルプ シャンプー 詰替 大容量", maker:"ネイチャーラボ", price:1550, tax:10, qtyDefault:1, etcP:930, etcLabel:"レシチャレ",
+   note:"ブラフラ対象外メーカー。投稿は1136pt・実質206円(計算式では1137pt・207円)"},
+  {cat:"レシチャレ（ブラフラ対象外）", name:"マイブースターズ インシルク シャントリ 詰替", maker:"マイブースターズ", price:1180, tax:10, qtyDefault:1, etcP:710, etcLabel:"レシチャレ",
+   note:"ブラフラ対象外メーカー。ケラチン詰替(レシチャレ700P)は実質165円"},
 
   // ── PayPayクーポン ──
   {cat:"PayPayクーポン 30%（〜10/31）", name:"ルナフィット（対象品）", maker:"大王製紙", tax:10, qtyDefault:1, rate:30, ppGroup:"luna",
@@ -426,8 +445,9 @@ function recalc(){
   PRODUCTS.forEach((p,i) => {
     if(qty[i] <= 0) return;
     const zk = zeikomi(price[i], qty[i], p.tax);
-    T += zk; count += qty[i];
-    if(p.bf){ bfZk += zk; bfCnt += qty[i]; bfRaw += Math.floor(zk * BF_RATE); }
+    const pc = p.pcs || 1;
+    T += zk; count += qty[i] * pc;
+    if(p.bf){ bfZk += zk; bfCnt += qty[i] * pc; bfRaw += Math.floor(zk * BF_RATE); }
     if(p.etcP) etcTotal += p.etcP * qty[i];
     rows.push({zk: zk, rate: rate[i], group: p.ppGroup});
   });
